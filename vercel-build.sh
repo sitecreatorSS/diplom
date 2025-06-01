@@ -33,6 +33,10 @@ else
   echo "No seed files found. Skipping database seeding."
 fi
 
+# Verify database connection
+echo "=== Verifying database connection... ==="
+npx prisma db execute --file prisma/verify-connection.sql --schema=./prisma/schema.prisma
+
 # Build the application
 echo "=== Building the application... ==="
 npm run build
