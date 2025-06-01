@@ -3,9 +3,9 @@ const nextConfig = {
   images: {
     domains: ['example.com', 'via.placeholder.com'],
   },
-  basePath: '/Shop', // Repository name
-  assetPrefix: '/Shop/', // Repository name
-  trailingSlash: true,
+  // Убрали basePath и assetPrefix для деплоя в корень
+  trailingSlash: false, // Меняем на false для более чистых URL
+  output: 'standalone', // Оптимизация для продакшн-сборки
 }
 
 module.exports = nextConfig
