@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Магазин одежды
 
-## Getting Started
+Веб-приложение для онлайн-магазина одежды с поддержкой ролей пользователей (администратор, продавец, покупатель).
 
-First, run the development server:
+## Функциональность
 
+- Регистрация и авторизация пользователей
+- Три роли пользователей:
+  - Администратор: управление пользователями и товарами
+  - Продавец: добавление и управление своими товарами
+  - Покупатель: просмотр товаров и управление корзиной
+- Каталог товаров с фильтрацией
+- Корзина покупок
+- Цены в рублях
+- Полностью русскоязычный интерфейс
+
+## Технологии
+
+- Next.js 14
+- TypeScript
+- Prisma (PostgreSQL)
+- Tailwind CSS
+- JWT для аутентификации
+
+## Установка
+
+1. Клонируйте репозиторий:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd shop
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Установите зависимости:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Создайте файл `.env` в корневой директории и добавьте следующие переменные:
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/shop"
+JWT_SECRET="your-secret-key"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Инициализируйте базу данных:
+```bash
+npx prisma migrate dev
+```
 
-## Learn More
+5. Запустите приложение:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Временные аккаунты для тестирования
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Администратор
+- Email: admin@example.com
+- Пароль: admin123
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Продавец
+- Email: seller@example.com
+- Пароль: seller123
 
-## Deploy on Vercel
+### Покупатель
+- Email: buyer@example.com
+- Пароль: buyer123
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Структура проекта
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/src/app` - Страницы приложения
+- `/src/components` - React компоненты
+- `/src/lib` - Утилиты и хелперы
+- `/prisma` - Схема базы данных и миграции
+- `/public` - Статические файлы
+
+## API Endpoints
+
+### Аутентификация
+- POST `/api/auth/register` - Регистрация
+- POST `/api/auth/login` - Вход
+
+### Товары
+- GET `/api/products` - Получение списка товаров
+- POST `/api/products` - Создание товара (только для продавцов)
+- GET `/api/products/seller` - Получение товаров продавца
+
+### Корзина
+- GET `/api/cart` - Получение корзины
+- POST `/api/cart` - Добавление товара в корзину
+- PATCH `/api/cart/items/:id` - Обновление количества
+- DELETE `/api/cart/items/:id` - Удаление товара из корзины
+
+### Администратор
+- GET `/api/admin/users` - Получение списка пользователей
+- PATCH `/api/admin/users/:id` - Обновление роли пользователя
+- GET `/api/admin/products` - Получение всех товаров
