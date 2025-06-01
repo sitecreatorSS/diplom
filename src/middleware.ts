@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from './lib/auth';
 
 // List of public paths that don't require authentication
 const publicPaths = [
@@ -19,7 +18,7 @@ const adminPaths = [
   '/api/admin/*',
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Skip middleware for public paths
@@ -45,11 +44,34 @@ export function middleware(request: NextRequest) {
   }
 
   try {
-    const decoded = verifyToken(token);
+    // Call the new API route to verify the token
+    const verifyResponse = await fetch(new URL('/api/auth/verify-token', request.url), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    if (!verifyResponse.ok) {
+      // If API returns an error (invalid token), redirect or return error
+      if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+        const loginUrl = new URL('/auth/login', request.url);
+        loginUrl.searchParams.set('callbackUrl', pathname);
+        loginUrl.searchParams.set('error', 'SessionExpired');
+        return NextResponse.redirect(loginUrl);
+      }
     
+      const errorBody = await verifyResponse.json();
+      return NextResponse.json(errorBody, { status: verifyResponse.status });
+    }
+
+    // Token is valid, get user info from API response
+    const { user: decoded } = await verifyResponse.json();
+
     // Check if user is trying to access admin routes without admin role
-    if (adminPaths.some(path => 
-      pathname === path || 
+    if (adminPaths.some(path =>
+      pathname === path ||
       (path.endsWith('/*') && pathname.startsWith(path.replace('/*', '')))
     )) {
       if (decoded.role !== 'ADMIN') {
@@ -60,7 +82,8 @@ export function middleware(request: NextRequest) {
       }
     }
 
-    // Add user info to request headers
+    // Add user info to request headers (optional, depending on how you access user info later)
+    // You might prefer fetching user info in server components/API routes directly
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-id', decoded.userId);
     requestHeaders.set('x-user-role', decoded.role);
@@ -70,6 +93,7 @@ export function middleware(request: NextRequest) {
         headers: requestHeaders,
       },
     });
+
   } catch (error) {
     // If token is invalid and trying to access protected route, redirect to login
     if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
