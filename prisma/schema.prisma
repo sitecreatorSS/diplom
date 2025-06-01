@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("PRISMA_POSTGRES_URL") // Используем переменную с префиксом PRISMA_
+  relationMode = "prisma" // Добавляем для совместимости с Vercel Postgres
 }
 
 enum UserRole {

@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
-    "postbuild": "prisma migrate deploy && npm run db:seed",
+    "postinstall": "prisma generate",
+    "migrate:dev": "prisma migrate dev --name init",
+    "migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.js",
     "start": "next start -p $PORT",
     "lint": "next lint",
     "export": "next build && next export",
-    "db:init": "ts-node ./scripts/init-db.ts",
-    "db:seed": "node prisma/seed.js",
     "db:reset": "npx prisma migrate reset --force && npm run db:seed"
   },
   "dependencies": {
