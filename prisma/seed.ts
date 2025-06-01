@@ -110,36 +110,46 @@ async function main() {
     await prisma.user.deleteMany({});
 
     // Создание пользователей
-    const hashedPassword = await hash('password123', 12);
+    const adminPassword = 'admin123';
+    const userPassword = 'password123';
+    
+    console.log('Создание пользователя admin@example.com с паролем:', adminPassword);
+    const hashedAdminPassword = await hash(adminPassword, 12);
+    const hashedUserPassword = await hash(userPassword, 12);
 
     const adminUser = await prisma.user.create({
       data: {
         name: 'Admin User',
         email: 'admin@example.com',
-        password: hashedPassword,
+        password: hashedAdminPassword,
         role: 'ADMIN',
+        emailVerified: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
+    console.log('Создание пользователя seller@example.com с паролем:', userPassword);
     const sellerUser = await prisma.user.create({
       data: {
         name: 'Seller User',
         email: 'seller@example.com',
-        password: hashedPassword,
+        password: hashedUserPassword,
         role: 'SELLER',
+        emailVerified: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
+    console.log('Создание пользователя customer@example.com с паролем:', userPassword);
     const customerUser = await prisma.user.create({
       data: {
         name: 'Customer User',
         email: 'customer@example.com',
-        password: hashedPassword,
+        password: hashedUserPassword,
         role: 'BUYER',
+        emailVerified: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       },

@@ -6,6 +6,8 @@
       "use": "@vercel/next"
     }
   ],
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
   "build": {
     "env": {
       "PRISMA_POSTGRES_PRISMA_URL": "$PRISMA_POSTGRES_PRISMA_URL",
