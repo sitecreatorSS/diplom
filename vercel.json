@@ -8,12 +8,8 @@
   ],
   "build": {
     "env": {
-      "PRISMA_POSTGRES_PRISMA_URL": {
-        "description": "Connection string for Prisma to connect to the database"
-      },
-      "PRISMA_POSTGRES_URL_NON_POOLING": {
-        "description": "Connection string for direct database connections"
-      }
+      "PRISMA_POSTGRES_PRISMA_URL": "$PRISMA_POSTGRES_PRISMA_URL",
+      "PRISMA_POSTGRES_URL_NON_POOLING": "$PRISMA_POSTGRES_URL_NON_POOLING"
     }
   },
   "routes": [
