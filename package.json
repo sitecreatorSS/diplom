@@ -12,7 +12,7 @@
     "prisma:studio": "prisma studio",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
-    "vercel-build": "prisma generate && prisma db push --accept-data-loss && next build",
+    "vercel-build": "prisma generate && prisma db push --accept-data-loss && npm run prisma:seed && next build",
     "postinstall": "prisma generate",
     "db:setup": "prisma migrate deploy && ts-node --transpile-only prisma/seed.ts",
     "db:seed": "ts-node --transpile-only prisma/seed.ts",
