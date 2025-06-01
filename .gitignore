@@ -42,11 +42,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-/prisma/migrations/*
-!/prisma/migrations/.gitkeep
-/prisma/*.db
-/prisma/*.db-journal
+# Database
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
 
 # ide specific files
 .idea/

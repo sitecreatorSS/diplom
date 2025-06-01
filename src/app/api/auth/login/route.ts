@@ -1,18 +1,21 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { verifyPassword, generateToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
+import { findUserByEmail } from '@/lib/repositories/user.repository';
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email и пароль обязательны' },
+        { status: 400 }
+      );
+    }
 
-    if (!user) {
+    const user = await findUserByEmail(email);
+
+    if (!user || !user.password) {
       return NextResponse.json(
         { error: 'Пользователь не найден' },
         { status: 404 }
@@ -31,7 +34,7 @@ export async function POST(request: Request) {
     const token = generateToken({
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role as 'ADMIN' | 'SELLER' | 'BUYER'
     });
 
     return NextResponse.json({
@@ -51,4 +54,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}

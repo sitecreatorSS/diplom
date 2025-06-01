@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { findProducts, createProduct } from '@/lib/repositories/product.repository';
 import { findUserById } from '@/lib/repositories/user.repository';
+import { query } from '@/lib/db';
 
 // Helper function to generate a random rating between 3.5 and 5
 const generateRandomRating = () => {
@@ -18,7 +19,7 @@ const tryParseJson = <T>(value: string | null | undefined, fallback: T): T => {
   }
 };
 
-// Отключаем статическую генерацию для этого роута
+// Disable static generation for this route
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
@@ -29,39 +30,39 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '0');
 
     // Build SQL query conditions
-    let query = 'SELECT * FROM "Product" WHERE 1=1';
+    let queryStr = 'SELECT * FROM "Product" WHERE 1=1';
     const params: any[] = [];
     let paramIndex = 1;
 
     if (category) {
-      query += ` AND category = $${paramIndex++}`;
+      queryStr += ` AND "category" = $${paramIndex++}`;
       params.push(category);
     }
 
     if (search) {
-      query += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+      queryStr += ` AND ("name" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
       paramIndex++;
     }
 
     // Get total count
-    const countQuery = `SELECT COUNT(*) as total FROM (${query}) as subquery`;
+    const countQuery = `SELECT COUNT(*) as total FROM (${queryStr}) as subquery`;
     const totalResult = await query(countQuery, params);
     const total = parseInt(totalResult.rows[0].total, 10);
 
     // Add ordering and limit
-    query += ' ORDER BY "createdAt" DESC';
+    queryStr += ' ORDER BY "createdAt" DESC';
     if (limit > 0) {
-      query += ` LIMIT $${paramIndex}`;
+      queryStr += ` LIMIT $${paramIndex}`;
       params.push(limit);
     }
 
     // Get products
-    const result = await query(query, params);
+    const result = await query(queryStr, params);
     const products = result.rows;
 
     // Transform products
-    const transformedProducts = await Promise.all(products.map(async (product) => {
+    const transformedProducts = await Promise.all(products.map(async (product: any) => {
       // Get seller info
       const seller = await findUserById(product.sellerId);
       
@@ -179,24 +180,24 @@ export async function POST(request: Request) {
       stock,
       specifications,
       sellerId: user.id,
-      image: imageUrl,
-            },
-          },
-        },
-      }) as unknown as (ProductWithImages & { rating?: number }) | null;
-
-      if (!createdProduct) {
-        throw new Error('Failed to fetch created product');
-      }
-
-      return createdProduct;
+      image: imageUrl || '',
     });
 
-    return NextResponse.json(product);
+    // In a real app, you would also handle the file upload here
+    // and create records in the images table
+
+    return NextResponse.json({
+      success: true,
+      message: 'Товар успешно создан',
+      product: {
+        ...product,
+        image: product.image || null,
+      },
+    });
   } catch (error) {
-    console.error('Products create error:', error);
+    console.error('Error creating product:', error);
     return NextResponse.json(
-      { error: 'Ошибка при создании товара' },
+      { error: 'Не удалось создать товар' },
       { status: 500 }
     );
   }

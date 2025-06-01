@@ -1,15 +1,21 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@/types/database';
+import { findUserByEmail } from './repositories/user.repository';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  image?: string | null;
+}
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -22,9 +28,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Требуется ввести email и пароль');
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        const user = await findUserByEmail(credentials.email);
 
         if (!user || !user.password) {
           throw new Error('Неверный email или пароль');
@@ -44,7 +48,6 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          image: user.image,
         };
       },
     }),
@@ -65,8 +68,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
-        session.user.id = token.id;
+        session.user.role = token.role as UserRole;
+        session.user.id = token.id as string;
       }
       return session;
     },

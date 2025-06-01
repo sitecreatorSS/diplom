@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { findUserByEmail } from "@/lib/repositories/user.repository";
 
 export async function GET() {
   try {
@@ -13,18 +13,8 @@ export async function GET() {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        sellerApplication: true,
-        _count: {
-          select: {
-            orders: true,
-            products: true,
-          },
-        },
-      },
-    });
+    // Получаем пользователя по email
+    const user = await findUserByEmail(session.user.email);
 
     if (!user) {
       return NextResponse.json(
@@ -36,7 +26,18 @@ export async function GET() {
     // Удаляем хеш пароля из ответа
     const { password, ...userWithoutPassword } = user;
 
-    return NextResponse.json(userWithoutPassword);
+    // TODO: Добавить загрузку sellerApplication, количества заказов и продуктов
+    // когда будут реализованы соответствующие репозитории
+    const userWithStats = {
+      ...userWithoutPassword,
+      _count: {
+        orders: 0,
+        products: 0,
+      },
+      sellerApplication: null,
+    };
+
+    return NextResponse.json(userWithStats);
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json(

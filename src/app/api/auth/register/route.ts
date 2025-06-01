@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, UserRole } from '@prisma/client';
 import { hash } from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { findUserByEmail, createUser } from '@/lib/repositories/user.repository';
 
 export async function POST(request: Request) {
   try {
@@ -43,16 +41,13 @@ export async function POST(request: Request) {
     }
 
     // Проверяем, существует ли пользователь с таким email
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-      select: { id: true },
-    });
+    const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
       return NextResponse.json(
         { 
           success: false,
-          message: 'Пользователь с таким email уже зарегистрирован',
+          message: 'Пользователь с таким email уже существует',
           field: 'email'
         },
         { status: 400 }
@@ -60,59 +55,34 @@ export async function POST(request: Request) {
     }
 
     // Хешируем пароль
-    const hashedPassword = await hash(password, 10);
-    
-    // Создаем пользователя с ролью BUYER по умолчанию
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role: UserRole.BUYER, // Используем BUYER как роль по умолчанию
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-      },
+    const hashedPassword = await hash(password, 12);
+
+    // Создаем нового пользователя
+    const user = await createUser({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'BUYER', // По умолчанию регистрируем как покупателя
     });
 
-    // Возвращаем успешный ответ без чувствительных данных
+    const { password: _, ...userWithoutPassword } = user;
+
     return NextResponse.json(
       { 
-        success: true,
-        message: 'Пользователь успешно зарегистрирован',
-        user,
+        success: true, 
+        message: 'Регистрация прошла успешно',
+        user: userWithoutPassword
       },
       { status: 201 }
     );
   } catch (error) {
     console.error('Registration error:', error);
-    
-    // Более детальная обработка ошибок
-    let errorMessage = 'Произошла ошибка при регистрации';
-    let statusCode = 500;
-    
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      
-      // Обработка ошибок Prisma
-      if (error.message.includes('prisma') || error.message.includes('database')) {
-        errorMessage = 'Ошибка базы данных';
-      }
-    }
-    
     return NextResponse.json(
       { 
-        success: false,
-        message: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        success: false, 
+        message: 'Ошибка при регистрации' 
       },
-      { status: statusCode }
+      { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
