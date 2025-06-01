@@ -17,7 +17,7 @@ export async function PATCH(
       );
     }
 
-    const { userId } = verifyToken(token);
+    const { id: userId } = verifyToken(token);
     const { quantity } = await request.json();
 
     const cartItem = await prisma.cartItem.findUnique({
@@ -67,7 +67,7 @@ export async function DELETE(
       );
     }
 
-    const { userId } = verifyToken(token);
+    const { id: userId } = verifyToken(token);
 
     const cartItem = await prisma.cartItem.findUnique({
       where: { id: params.id },

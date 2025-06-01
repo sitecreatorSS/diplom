@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const { userId, role } = verifyToken(token);
+    const { id: userId, role } = verifyToken(token);
 
     if (role !== UserRole.SELLER && role !== UserRole.ADMIN) {
       return NextResponse.json(

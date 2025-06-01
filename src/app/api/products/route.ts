@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { userId, role } = verifyToken(token);
+    const { id: userId, role } = verifyToken(token);
 
     if (role !== 'SELLER' && role !== 'ADMIN') {
       return NextResponse.json(

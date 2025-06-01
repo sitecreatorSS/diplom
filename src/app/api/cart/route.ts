@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const { userId } = verifyToken(token);
+    const { id: userId } = verifyToken(token);
 
     const items = await prisma.cartItem.findMany({
       where: { userId },
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { userId } = verifyToken(token);
+    const { id: userId } = verifyToken(token);
     const { productId, quantity, size, color } = await request.json();
 
     if (!productId || quantity === undefined || quantity <= 0) {
