@@ -11,15 +11,19 @@ echo "NPM version: $(npm -v)"
 
 # Install dependencies
 echo "=== Installing dependencies... ==="
-npm install
+npm ci --prefer-offline --no-audit --progress=false
+
+# Install Prisma globally to ensure it's available
+echo "=== Installing Prisma CLI... ==="
+npm install -g prisma@6.8.1
 
 # Generate Prisma client
 echo "=== Generating Prisma client... ==="
-npx prisma generate
+prisma generate
 
 # Run database migrations
 echo "=== Running database migrations... ==="
-npx prisma migrate deploy
+prisma migrate deploy
 
 # Seed the database
 echo "=== Seeding the database... ==="

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "npm install -g prisma@6.8.1",
     "dev": "prisma generate && next dev",
     "build": "next build",
     "postinstall": "prisma generate",
@@ -33,6 +34,7 @@
     "next": "14.1.0",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.6",
+    "prisma": "^6.8.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sqlite": "^5.1.1",
@@ -55,7 +57,6 @@
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
     "postcss": "^8.4.35",
-    "prisma": "^6.8.2",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
