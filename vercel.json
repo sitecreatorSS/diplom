@@ -11,7 +11,8 @@
   "build": {
     "env": {
       "PRISMA_POSTGRES_PRISMA_URL": "$PRISMA_POSTGRES_PRISMA_URL",
-      "PRISMA_POSTGRES_URL_NON_POOLING": "$PRISMA_POSTGRES_URL_NON_POOLING"
+      "PRISMA_POSTGRES_URL_NON_POOLING": "$PRISMA_POSTGRES_URL_NON_POOLING",
+      "NODE_ENV": "production"
     }
   },
   "routes": [
@@ -23,5 +24,8 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

@@ -13,35 +13,24 @@ echo "NPM version: $(npm -v)"
 echo "=== Installing dependencies... ==="
 npm ci --prefer-offline --no-audit --progress=false
 
-# Install Prisma globally to ensure it's available
-echo "=== Installing Prisma CLI... ==="
-npm install -g prisma@6.8.1
-
 # Generate Prisma client
 echo "=== Generating Prisma client... ==="
-prisma generate
+npx prisma generate
 
 # Run database migrations
 echo "=== Running database migrations... ==="
-prisma migrate deploy
+npx prisma migrate deploy
 
 # Seed the database
 echo "=== Seeding the database... ==="
-# Check if seed script exists
 if [ -f "prisma/seed.js" ]; then
-  echo "Running seed script..."
+  echo "Running JavaScript seed..."
   node prisma/seed.js
+elif [ -f "prisma/seed.ts" ]; then
+  echo "Running TypeScript seed..."
+  npx ts-node --transpile-only prisma/seed.ts
 else
-  echo "Seed script not found at prisma/seed.js"
-  # Try TypeScript seed if JS version not found
-  if [ -f "prisma/seed.ts" ]; then
-    echo "Found TypeScript seed, installing ts-node..."
-    npm install -D ts-node typescript @types/node
-    echo "Running TypeScript seed..."
-    npx ts-node --transpile-only prisma/seed.ts
-  else
-    echo "No seed files found. Skipping database seeding."
-  fi
+  echo "No seed files found. Skipping database seeding."
 fi
 
 # Build the application
