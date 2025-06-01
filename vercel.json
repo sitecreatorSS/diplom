@@ -8,12 +8,19 @@
   ],
   "build": {
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "PRISMA_CLI_QUERY_ENGINE_TYPE": "dataproxy"
     }
   },
   "env": {
     "NODE_ENV": "production",
-    "DATABASE_URL": "$DATABASE_URL"
+    "DATABASE_URL": "$DATABASE_URL",
+    "DIRECT_URL": "$DIRECT_URL",
+    "NEXTAUTH_SECRET": "$NEXTAUTH_SECRET",
+    "NEXTAUTH_URL": "$NEXTAUTH_URL"
   },
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 }

@@ -12,11 +12,18 @@
     "prisma:studio": "prisma studio",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && PRISMA_CLI_QUERY_ENGINE_TYPE=dataproxy prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "db:setup": "prisma migrate deploy && ts-node --transpile-only prisma/seed.ts",
-    "export": "next build && next export",
-    "db:reset": "npx prisma migrate reset --force && npm run prisma:seed"
+    "db:seed": "PRISMA_CLI_QUERY_ENGINE_TYPE=dataproxy ts-node --transpile-only prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force && PRISMA_CLI_QUERY_ENGINE_TYPE=dataproxy ts-node --transpile-only prisma/seed.ts",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",

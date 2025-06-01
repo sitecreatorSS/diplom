@@ -2,12 +2,24 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 const runSeed = async () => {
-  console.log('Running database seed...');
-  console.log('Current directory:', process.cwd());
+  console.log('🚀 Starting database seed...');
+  console.log('📂 Current directory:', process.cwd());
 
-  // Ensure TypeScript is installed
-  console.log('Ensuring TypeScript is installed...');
-  require('child_process').execSync('npm install typescript ts-node @types/node --save-dev', { stdio: 'inherit' });
+  try {
+    // Ensure TypeScript is installed
+    console.log('🔧 Ensuring TypeScript is installed...');
+    execSync('npm install typescript ts-node @types/node --save-dev', { stdio: 'inherit' });
+
+    // Run the TypeScript seed file
+    console.log('🌱 Running TypeScript seed...');
+    const seedPath = path.join(__dirname, 'seed.ts');
+    execSync(`npx ts-node --transpile-only ${seedPath}`, { stdio: 'inherit' });
+    
+    console.log('✅ Database seed completed successfully!');
+  } catch (error) {
+    console.error('❌ Error running seed:', error);
+    process.exit(1);
+  }
 
   try {
     // Run TypeScript seed script using ts-node with proper paths
