@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "node vercel-build.js",
+    "vercel-build": "node vercel-build.cjs",
     "start": "next start",
     "lint": "next lint",
     "db:init": "ts-node --transpile-only -r dotenv/config src/db/init-db.ts",

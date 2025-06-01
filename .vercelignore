@@ -19,6 +19,7 @@ node_modules/
 *.crt
 *.cer
 *.pfx
+vercel-build.js
 *.der
 *.p12
 *.p7b
