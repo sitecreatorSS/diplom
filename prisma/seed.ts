@@ -12,6 +12,18 @@ const categories = [
   'ACCESSORIES'
 ] as const;
 
+// Функция для генерации случайного цвета в HEX формате
+const getRandomColor = () => {
+  return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+};
+
+// Функция для создания URL плейсхолдера с текстом
+const placeholderImage = (text: string, width = 600, height = 400) => {
+  const bgColor = getRandomColor();
+  const textColor = parseInt(bgColor.replace('#', ''), 16) > 0xffffff/1.5 ? '000000' : 'ffffff';
+  return `https://placehold.co/${width}x${height}/${bgColor.substring(1)}/${textColor}?text=${encodeURIComponent(text)}`;
+};
+
 const products = [
   {
     name: 'Футболка оверсайз',
@@ -22,9 +34,9 @@ const products = [
     sizes: ['S', 'M', 'L', 'XL'],
     colors: ['Черный', 'Белый', 'Серый'],
     images: [
-      '/products/tshirt-1.jpg',
-      '/products/tshirt-2.jpg',
-      '/products/tshirt-3.jpg'
+      placeholderImage('Футболка 1'),
+      placeholderImage('Футболка 2'),
+      placeholderImage('Футболка 3')
     ]
   },
   {
@@ -36,8 +48,8 @@ const products = [
     sizes: ['28/30', '30/32', '32/34', '34/36'],
     colors: ['Синий', 'Черный'],
     images: [
-      '/products/jeans-1.jpg',
-      '/products/jeans-2.jpg'
+      placeholderImage('Джинсы 1'),
+      placeholderImage('Джинсы 2')
     ]
   },
   {
@@ -49,9 +61,9 @@ const products = [
     sizes: ['40', '41', '42', '43', '44'],
     colors: ['Белый', 'Черный', 'Красный'],
     images: [
-      '/products/shoes-1.jpg',
-      '/products/shoes-2.jpg',
-      '/products/shoes-3.jpg'
+      placeholderImage('Кроссовки 1'),
+      placeholderImage('Кроссовки 2'),
+      placeholderImage('Кроссовки 3')
     ]
   },
   {
@@ -63,8 +75,8 @@ const products = [
     sizes: ['S', 'M', 'L'],
     colors: ['Синий', 'Цветочный принт'],
     images: [
-      '/products/dress-1.jpg',
-      '/products/dress-2.jpg'
+      placeholderImage('Платье 1'),
+      placeholderImage('Платье 2')
     ]
   },
   {
@@ -76,8 +88,8 @@ const products = [
     sizes: ['S', 'M', 'L', 'XL'],
     colors: ['Черный', 'Коричневый'],
     images: [
-      '/products/jacket-1.jpg',
-      '/products/jacket-2.jpg'
+      placeholderImage('Куртка 1'),
+      placeholderImage('Куртка 2')
     ]
   },
   {
@@ -89,8 +101,8 @@ const products = [
     sizes: ['Универсальный'],
     colors: ['Черный', 'Серый', 'Бордовый'],
     images: [
-      '/products/beanie-1.jpg',
-      '/products/beanie-2.jpg'
+      placeholderImage('Шапка 1'),
+      placeholderImage('Шапка 2')
     ]
   }
 ];

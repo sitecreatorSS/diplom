@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Session } from 'next-auth';
-import type { Session as DefaultSession } from 'next-auth';
+import { UserRole } from '@prisma/client';
 import { User, LogOut, ShoppingCart, UserCog, Store, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -17,24 +16,15 @@ import {
 import { useState } from 'react';
 import CartWidgetNew from './CartWidgetNew';
 
-// Расширяем тип Session, чтобы включить пользовательские свойства
-declare module "next-auth" {
-  interface Session {
-    user: DefaultSession['user'] & {
-      id: string;
-      role: 'ADMIN' | 'SELLER' | 'BUYER';
-    };
-  }
-}
-
 export default function Navbar() {
   const { data: session } = useSession();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
-    console.log('Navbar: Cart state toggled', !isCartOpen);
   };
+  
+  const userRole = session?.user?.role || 'BUYER';
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">

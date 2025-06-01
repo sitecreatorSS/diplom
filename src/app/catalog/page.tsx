@@ -30,17 +30,29 @@ export default function CatalogPage() { // Renamed from Home
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/products');
+        setError(null);
+        
+        const response = await fetch('/api/products', {
+          cache: 'no-store', // Отключаем кэширование
+          next: { revalidate: 0 } // Всегда обновлять данные
+        });
         
         if (!response.ok) {
-          throw new Error('Не удалось загрузить товары');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Не удалось загрузить товары');
         }
         
         const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Получены некорректные данные о товарах');
+        }
+        
+        console.log('Загружены товары:', data); // Логируем для отладки
         setProducts(data);
       } catch (err) {
         console.error('Ошибка при получении товаров:', err);
-        setError(err instanceof Error ? err.message : 'Произошла ошибка');
+        setError(err instanceof Error ? err.message : 'Произошла ошибка при загрузке каталога');
       } finally {
         setIsLoading(false);
       }

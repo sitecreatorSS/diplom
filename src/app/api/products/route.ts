@@ -29,6 +29,9 @@ const tryParseJson = <T>(value: string | null | undefined, fallback: T): T => {
   }
 };
 
+// Отключаем статическую генерацию для этого роута
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -43,8 +46,7 @@ export async function GET(request: Request) {
           { name: { contains: search, mode: 'insensitive' as const } },
           { description: { contains: search, mode: 'insensitive' as const } },
         ],
-      } : {}),
-      stock: { gt: 0 },
+      } : {})
     };
 
     const products = await prisma.product.findMany({
@@ -73,21 +75,48 @@ export async function GET(request: Request) {
 
     // Transform the data to match the frontend expectations
     const transformedProducts = products.map(product => {
+      console.log('Original product:', JSON.stringify(product, null, 2));
+      
       // Add a random rating for demo purposes if not present
       const rating = product.rating || generateRandomRating();
       
-      return {
-        ...product,
+      // Parse JSON fields with fallback to empty arrays
+      const colors = tryParseJson<string[]>(product.colors, []);
+      const sizes = tryParseJson<string[]>(product.sizes, []);
+      
+      // Ensure images is always an array with at least one item
+      let images = [];
+      if (product.images && product.images.length > 0) {
+        images = product.images.map(img => ({
+          url: img.url.startsWith('http') ? img.url : `/placeholder-product.jpg`,
+          alt: img.alt || 'Изображение товара'
+        }));
+      } else {
+        images = [{ 
+          url: '/placeholder-product.jpg', 
+          alt: 'Изображение отсутствует' 
+        }];
+      }
+      
+      const transformed = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        category: product.category,
+        stock: product.stock,
         rating,
-        // Parse JSON fields with fallback to empty arrays
-        colors: tryParseJson<string[]>(product.colors, []),
-        sizes: tryParseJson<string[]>(product.sizes, []),
-        // Map images to the expected format
-        images: product.images && product.images.length > 0 
-          ? product.images 
-          : [{ url: '/placeholder-product.jpg', alt: 'Изображение отсутствует' }],
+        colors,
+        sizes,
+        images,
+        seller: product.seller || { name: 'Продавец' }
       };
+      
+      console.log('Transformed product:', JSON.stringify(transformed, null, 2));
+      return transformed;
     });
+    
+    console.log('Total products found:', transformedProducts.length);
 
     return NextResponse.json(transformedProducts);
   } catch (error) {
