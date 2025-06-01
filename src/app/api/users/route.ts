@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { query } from '@/lib/db';
 
 // GET /api/users - получение списка пользователей
 export async function GET() {
@@ -14,21 +14,18 @@ export async function GET() {
     }
 
     // Получаем всех пользователей из базы данных
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        // lastLogin: true, // Temporarily remove lastLogin
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const result = await query(`
+      SELECT 
+        id,
+        name,
+        email,
+        role,
+        created_at as "createdAt"
+      FROM "User"
+      ORDER BY created_at DESC
+    `);
 
-    return NextResponse.json(users);
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error fetching users:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
@@ -49,24 +46,27 @@ export async function PUT(request: Request) {
     const { id, name, email, role } = body;
 
     // Обновляем пользователя в базе данных
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
+    const result = await query(`
+      UPDATE "User"
+      SET 
+        name = $1,
+        email = $2,
+        role = $3,
+        updated_at = NOW()
+      WHERE id = $4
+      RETURNING 
+        id,
         name,
         email,
         role,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        // lastLogin: true, // Temporarily remove lastLogin
-      },
-    });
+        created_at as "createdAt"
+    `, [name, email, role, id]);
 
-    return NextResponse.json(updatedUser);
+    if (result.rows.length === 0) {
+      return new NextResponse('User not found', { status: 404 });
+    }
+
+    return NextResponse.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating user:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
@@ -91,9 +91,7 @@ export async function DELETE(request: Request) {
     }
 
     // Удаляем пользователя из базы данных
-    await prisma.user.delete({
-      where: { id },
-    });
+    await query('DELETE FROM "User" WHERE id = $1', [id]);
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

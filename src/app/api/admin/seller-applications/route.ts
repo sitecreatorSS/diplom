@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { query } from '@/lib/db';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -12,35 +12,37 @@ export async function GET() {
   }
 
   try {
-    const applications = await prisma.sellerApplication.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            createdAt: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+    // Получаем все заявки с информацией о пользователях
+    const applicationsResult = await query(`
+      SELECT 
+        sa.*,
+        json_build_object(
+          'id', u.id,
+          'name', u.name,
+          'email', u.email,
+          'role', u.role,
+          'createdAt', u.created_at
+        ) as user
+      FROM "SellerApplication" sa
+      JOIN "User" u ON sa.user_id = u.id
+      ORDER BY sa.created_at DESC
+    `);
+
+    // Получаем статистику
+    const statsResult = await query(`
+      SELECT 
+        COUNT(*) as total_users,
+        COUNT(*) FILTER (WHERE role = 'SELLER') as total_sellers,
+        COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers
+      FROM "User"
+    `);
+
+    const stats = statsResult.rows[0];
+
+    return NextResponse.json({
+      applications: applicationsResult.rows,
+      stats
     });
-
-    // Возможно, также полезно вернуть общую статистику для админ панели
-    const totalUsers = await prisma.user.count();
-    const totalSellers = await prisma.user.count({ where: { role: 'SELLER' } });
-    const totalBuyers = await prisma.user.count({ where: { role: 'BUYER' } });
-
-    const stats = {
-      totalUsers,
-      totalSellers,
-      totalBuyers,
-    };
-
-    return NextResponse.json({ applications, stats });
   } catch (error) {
     console.error('Ошибка при получении заявок продавцов:', error);
     return NextResponse.json({ message: 'Ошибка сервера при получении заявок' }, { status: 500 });
@@ -62,54 +64,60 @@ export async function POST(request: Request) {
   }
 
   try {
-    const application = await prisma.sellerApplication.findUnique({
-      where: { id: applicationId },
-      include: { user: true },
-    });
+    // Начинаем транзакцию
+    await query('BEGIN');
 
-    if (!application) {
-      return NextResponse.json({ message: 'Заявка не найдена' }, { status: 404 });
-    }
+    try {
+      // Получаем заявку и пользователя
+      const applicationResult = await query(
+        `SELECT sa.*, u.id as user_id, u.role as user_role
+         FROM "SellerApplication" sa
+         JOIN "User" u ON sa.user_id = u.id
+         WHERE sa.id = $1`,
+        [applicationId]
+      );
 
-    // Обновляем статус заявки
-    const updatedApplication = await prisma.sellerApplication.update({
-      where: { id: applicationId },
-      data: {
-        status,
-        reviewNotes,
-        reviewedAt: new Date(),
-        reviewedBy: session.user.id,
-      },
-      include: {
-        user: true,
+      if (applicationResult.rows.length === 0) {
+        await query('ROLLBACK');
+        return NextResponse.json({ message: 'Заявка не найдена' }, { status: 404 });
       }
-    });
 
-    // Если заявка одобрена, обновляем роль пользователя на SELLER
-    if (status === 'APPROVED') {
-      await prisma.user.update({
-        where: { id: application.userId },
-        data: { role: 'SELLER' }
+      const application = applicationResult.rows[0];
+
+      // Обновляем статус заявки
+      const updatedApplicationResult = await query(
+        `UPDATE "SellerApplication"
+         SET 
+           status = $1,
+           review_notes = $2,
+           reviewed_at = NOW(),
+           reviewed_by = $3,
+           updated_at = NOW()
+         WHERE id = $4
+         RETURNING *`,
+        [status, reviewNotes, session.user.id, applicationId]
+      );
+
+      // Если заявка одобрена, обновляем роль пользователя
+      if (status === 'APPROVED') {
+        await query(
+          `UPDATE "User"
+           SET role = 'SELLER', updated_at = NOW()
+           WHERE id = $1`,
+          [application.user_id]
+        );
+      }
+
+      await query('COMMIT');
+
+      return NextResponse.json({
+        message: `Заявка ${applicationId} ${status === 'APPROVED' ? 'одобрена' : 'отклонена'}`,
+        application: updatedApplicationResult.rows[0]
       });
-    } else if (status === 'REJECTED') {
-      // Если заявка отклонена, убедимся, что роль пользователя не SELLER (если вдруг была) и не ADMIN
-      // На данный момент мы не меняем роль обратно на BUYER при отклонении, если она уже была SELLER или ADMIN.
-      // Если нужно сбрасывать роль на BUYER при отклонении, добавьте здесь логику:
-      /*
-      if (application.user.role === 'PENDING_SELLER') { // Если у вас есть такой промежуточный статус
-        await prisma.user.update({
-          where: { id: application.userId },
-          data: {
-            role: 'BUYER',
-          },
-        });
-      }
-      */
-      // TODO: Возможно, отправить email пользователю об отклонении
+    } catch (error) {
+      await query('ROLLBACK');
+      throw error;
     }
-
-    // Возвращаем только статус обновления и обновленную заявку (без stats)
-    return NextResponse.json({ message: `Заявка ${applicationId} ${status === 'APPROVED' ? 'одобрена' : 'отклонена'}`, application: updatedApplication });
   } catch (error) {
     console.error('Ошибка при обновлении статуса заявки:', error);
     return NextResponse.json({ message: 'Ошибка сервера при обновлении заявки' }, { status: 500 });

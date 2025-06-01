@@ -1,14 +1,29 @@
 const { execSync } = require('child_process');
 const { join } = require('path');
-require('dotenv').config();
+require('dotenv').config({ override: true });
+
+console.log('DEBUG POSTGRES_URL_NON_POOLING:', process.env.POSTGRES_URL_NON_POOLING);
+console.log('DEBUG DATABASE_URL:', process.env.DATABASE_URL);
 
 async function run() {
   try {
     console.log('Installing dependencies...');
     execSync('npm install', { 
       stdio: 'inherit',
-      env: { ...process.env, NODE_ENV: 'production' }
+      env: { 
+        ...process.env, 
+        NODE_ENV: 'production',
+        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
+      }
     });
+
+    // Debug: Print all environment variables
+    console.log('Environment variables:');
+    console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+    console.log('POSTGRES_URL_NON_POOLING:', process.env.POSTGRES_URL_NON_POOLING ? 'Set' : 'Not set');
+    console.log('NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET ? 'Set' : 'Not set');
+    console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL ? 'Set' : 'Not set');
+    console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Not set');
 
     // Проверяем наличие переменных окружения
     const requiredEnvVars = [
@@ -25,28 +40,42 @@ async function run() {
       process.exit(1);
     }
 
+    // Устанавливаем переменные окружения для дочерних процессов
+    const env = {
+      ...process.env,
+      NODE_ENV: 'production',
+      NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
+    };
+
     console.log('Running database migrations...');
-    execSync(`node --experimental-modules --es-module-specifier-resolution=node ${join('src', 'db', 'migrate.js')}`, { 
-      stdio: 'inherit',
-      env: { 
-        ...process.env,
-        NODE_ENV: 'production'
-      }
-    });
+    try {
+      execSync('npm run db:migrate', { 
+        stdio: 'inherit',
+        env
+      });
+    } catch (error) {
+      console.error('Error running migrations:', error);
+      process.exit(1);
+    }
 
     console.log('Seeding database...');
-    execSync(`node --experimental-modules --es-module-specifier-resolution=node ${join('src', 'db', 'seed.js')}`, { 
-      stdio: 'inherit',
-      env: { 
-        ...process.env,
-        NODE_ENV: 'production'
-      }
-    });
+    try {
+      execSync('npm run db:seed', { 
+        stdio: 'inherit',
+        env
+      });
+    } catch (error) {
+      console.error('Error seeding database:', error);
+      // Продолжаем выполнение, даже если сидинг не удался
+    }
 
     console.log('Building Next.js application...');
     execSync('npm run build', { 
       stdio: 'inherit',
-      env: { ...process.env, NODE_ENV: 'production' }
+      env: { 
+        ...env,
+        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+      }
     });
 
     console.log('Build completed successfully!');

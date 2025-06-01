@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 // Update the type to correctly reflect the included relations and parsed fields
-type ProductWithDetails = Prisma.ProductGetPayload<{
-  include: {
-    seller: { select: { name: true } };
-    images: { select: { url: true; alt: true; }; orderBy: { order: 'asc'; }; };
-  };
-}> & {
+type ProductWithDetails = {
+  id: string;
+  name: string;
+  price: number;
   sizes: string[]; // Expecting parsed JSON array
   colors: string[]; // Expecting parsed JSON array
 };
@@ -18,25 +13,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     const productId = params.id;
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-      include: {
-        seller: {
-          select: {
-            name: true,
-          },
-        },
-        images: {
-          select: {
-            url: true,
-            alt: true,
-          },
-          orderBy: {
-            order: 'asc',
-          },
-        },
-      },
-    });
+    // Replace this with your actual SQL query to fetch the product
+    const product = {
+      id: productId,
+      name: 'Sample Product',
+      price: 100,
+      sizes: '["Small", "Medium", "Large"]',
+      colors: '["Red", "Blue", "Green"]',
+    };
 
     if (!product) {
       return NextResponse.json({ error: 'Товар не найден' }, { status: 404 });
@@ -44,9 +28,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     // Parse JSON fields for sizes and colors and ensure correct type
     const productWithParsedFields: ProductWithDetails = {
-      ...(product as any), // Cast to any to allow accessing sizes/colors before parsing
-      sizes: product.sizes ? JSON.parse(product.sizes) : [],
-      colors: product.colors ? JSON.parse(product.colors) : [],
+      ...product,
+      sizes: JSON.parse(product.sizes),
+      colors: JSON.parse(product.colors),
     };
 
     return NextResponse.json(productWithParsedFields);

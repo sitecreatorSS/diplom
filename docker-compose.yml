@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15-alpine
+    container_name: shop_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shop_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shop_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shop_network
+
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base  # Используем базовый образ для разработки
+    container_name: shop_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/shop_db?schema=public
+      - POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@db:5432/shop_db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-nextauth-secret
+      - JWT_SECRET=your-jwt-secret
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - shop_network
+    command: sh -c "npm install && npm run dev"
+
+  # Adminer for database management (optional)
+  adminer:
+    image: adminer:latest
+    container_name: shop_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - shop_network
+
+networks:
+  shop_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

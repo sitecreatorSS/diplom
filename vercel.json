@@ -8,7 +8,8 @@
   ],
   "build": {
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "NODE_OPTIONS": "--experimental-modules --es-module-specifier-resolution=node"
     }
   },
   "env": {
@@ -17,7 +18,8 @@
     "POSTGRES_URL_NON_POOLING": "$POSTGRES_URL_NON_POOLING",
     "NEXTAUTH_SECRET": "$NEXTAUTH_SECRET",
     "NEXTAUTH_URL": "$NEXTAUTH_URL",
-    "JWT_SECRET": "$JWT_SECRET"
+    "JWT_SECRET": "$JWT_SECRET",
+    "NODE_OPTIONS": "--experimental-modules --es-module-specifier-resolution=node"
   },
   "regions": ["iad1"],
   "buildCommand": "npm run vercel-build",

@@ -1,14 +1,15 @@
-import { migrate, seed } from './index.js';
+import { migrate } from './migrate.js';
+import { seed } from './seed.js';
 
 async function initializeDatabase() {
   try {
     console.log('Starting database initialization...');
     
-    // Apply migrations
+    // Применяем миграции
     console.log('Applying database migrations...');
     await migrate();
     
-    // Seed the database with initial data
+    // Заполняем базу начальными данными
     console.log('Seeding database with initial data...');
     await seed();
     
@@ -20,5 +21,7 @@ async function initializeDatabase() {
   }
 }
 
-// Run the initialization
-initializeDatabase();
+// Запускаем инициализацию, если файл вызван напрямую
+if (require.main === module) {
+  initializeDatabase();
+}

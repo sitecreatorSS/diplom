@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { query } from '@/lib/db';
 
 export async function POST(req: Request) {
   try {
@@ -13,10 +13,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { sellerApplication: true }
-    });
+    // Получаем пользователя
+    const userResult = await query(
+      'SELECT * FROM "User" WHERE email = $1',
+      [session.user.email]
+    );
+    const user = userResult.rows[0];
 
     if (!user) {
       return NextResponse.json(
@@ -32,13 +34,20 @@ export async function POST(req: Request) {
       );
     }
 
-    if (user.sellerApplication) {
-      if (user.sellerApplication.status === 'PENDING') {
+    // Проверяем существующую заявку
+    const existingApplicationResult = await query(
+      'SELECT * FROM "SellerApplication" WHERE user_id = $1',
+      [user.id]
+    );
+    const existingApplication = existingApplicationResult.rows[0];
+
+    if (existingApplication) {
+      if (existingApplication.status === 'PENDING') {
         return NextResponse.json(
           { error: "Ваша заявка уже находится на рассмотрении" },
           { status: 400 }
         );
-      } else if (user.sellerApplication.status === 'APPROVED') {
+      } else if (existingApplication.status === 'APPROVED') {
         return NextResponse.json(
           { error: "Ваша заявка уже была одобрена" },
           { status: 400 }
@@ -48,24 +57,23 @@ export async function POST(req: Request) {
 
     const { message } = await req.json();
 
-    const application = await prisma.sellerApplication.upsert({
-      where: { userId: user.id },
-      update: {
-        status: 'PENDING',
-        message,
-        updatedAt: new Date(),
-        reviewedBy: null,
-        reviewedAt: null,
-        reviewNotes: null
-      },
-      create: {
-        userId: user.id,
-        status: 'PENDING',
-        message
-      }
-    });
+    // Создаем или обновляем заявку
+    const applicationResult = await query(
+      `INSERT INTO "SellerApplication" (
+        user_id, status, message, created_at, updated_at
+      ) VALUES ($1, 'PENDING', $2, NOW(), NOW())
+      ON CONFLICT (user_id) DO UPDATE SET
+        status = 'PENDING',
+        message = $2,
+        updated_at = NOW(),
+        reviewed_by = NULL,
+        reviewed_at = NULL,
+        review_notes = NULL
+      RETURNING *`,
+      [user.id, message]
+    );
 
-    return NextResponse.json(application);
+    return NextResponse.json(applicationResult.rows[0]);
   } catch (error) {
     console.error('Error submitting seller application:', error);
     return NextResponse.json(
@@ -85,20 +93,39 @@ export async function GET() {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { sellerApplication: true }
-    });
+    // Получаем пользователя и его заявку
+    const result = await query(
+      `SELECT 
+        u.*,
+        sa.*
+      FROM "User" u
+      LEFT JOIN "SellerApplication" sa ON u.id = sa.user_id
+      WHERE u.email = $1`,
+      [session.user.email]
+    );
 
-    if (!user) {
+    if (result.rows.length === 0) {
       return NextResponse.json(
         { error: "Пользователь не найден" },
         { status: 404 }
       );
     }
 
+    const user = result.rows[0];
+    const application = user.user_id ? {
+      id: user.id,
+      userId: user.user_id,
+      status: user.status,
+      message: user.message,
+      createdAt: user.created_at,
+      updatedAt: user.updated_at,
+      reviewedBy: user.reviewed_by,
+      reviewedAt: user.reviewed_at,
+      reviewNotes: user.review_notes
+    } : null;
+
     return NextResponse.json({
-      application: user.sellerApplication,
+      application,
       role: user.role
     });
   } catch (error) {

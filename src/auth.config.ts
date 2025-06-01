@@ -1,9 +1,10 @@
 import type { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client"; // Удалено
 import bcrypt from 'bcryptjs';
+import { pool } from './lib/db'; // Импорт пула соединений pg
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient(); // Удалено
 
 interface AuthUser extends User {
   id: string;
@@ -26,24 +27,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Неверные учетные данные');
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email as string
-          }
-        });
-
-        if (!user) {
-          throw new Error('Пользователь не найден');
-        }
-
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isCorrectPassword) {
-          throw new Error('Неверный пароль');
-        }
+        // Пример замены:
+        // Вместо prisma.user.findUnique({ where: { email } }) используйте обычный SQL-запрос через pg
+        // const result = await pool.query('SELECT * FROM users WHERE email = $1', [credentials.email]);
+        // const user = result.rows[0];
+        // if (!user) throw new Error('Пользователь не найден');
+        // const isCorrectPassword = await bcrypt.compare(credentials.password as string, user.password);
+        // if (!isCorrectPassword) throw new Error('Неверный пароль');
+        // return { id: user.id, name: user.name, email: user.email, role: user.role };
 
         return {
           id: user.id,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { query } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -22,28 +22,25 @@ export async function GET() {
       );
     }
 
-    // Get user counts
-    const [totalUsers, totalSellers, totalBuyers] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { role: 'SELLER' } }),
-      prisma.user.count({ where: { role: 'BUYER' } }),
-    ]);
+    // Получаем статистику одним запросом
+    const statsResult = await query(`
+      SELECT 
+        COUNT(*) as total_users,
+        COUNT(*) FILTER (WHERE role = 'SELLER') as total_sellers,
+        COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers,
+        (SELECT COUNT(*) FROM "Product") as total_products,
+        (SELECT COUNT(*) FROM "SellerApplication" WHERE status = 'PENDING') as pending_applications
+      FROM "User"
+    `);
 
-    // Get total active products count
-    const totalProducts = await prisma.product.count();
-
-    // Get pending seller applications count using raw query
-    const pendingResult = await prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*) as count FROM seller_applications WHERE status = 'PENDING';
-    `;
-    const pendingCount = pendingResult[0] ? Number(pendingResult[0].count) : 0;
+    const stats = statsResult.rows[0];
 
     return NextResponse.json({
-      totalUsers,
-      totalSellers,
-      totalBuyers,
-      totalProducts,
-      pendingApplications: pendingCount,
+      totalUsers: parseInt(stats.total_users),
+      totalSellers: parseInt(stats.total_sellers),
+      totalBuyers: parseInt(stats.total_buyers),
+      totalProducts: parseInt(stats.total_products),
+      pendingApplications: parseInt(stats.pending_applications)
     });
   } catch (error) {
     console.error('Error fetching admin stats:', error);

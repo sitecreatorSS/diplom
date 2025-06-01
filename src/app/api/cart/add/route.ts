@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { query } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -16,52 +16,58 @@ export async function POST(request: Request) {
     const { productId, quantity, size, color } = body;
 
     if (!productId || quantity === undefined || quantity <= 0) {
-        return new NextResponse('Invalid request payload', { status: 400 });
+      return new NextResponse('Invalid request payload', { status: 400 });
     }
 
-    // Find if the product already exists in the user's cart with the same size and color
-    const existingCartItem = await prisma.cartItem.findUnique({
-        where: {
-            userId_productId_size_color: { // Используем правильный формат составного уникального ключа
-                userId: userId,
-                productId: productId,
-                size: size || null,
-                color: color || null,
-            }
-        },
-    });
+    // Получаем цену товара
+    const productResult = await query(
+      'SELECT price FROM "Product" WHERE id = $1',
+      [productId]
+    );
+
+    if (productResult.rows.length === 0) {
+      return new NextResponse('Product not found', { status: 404 });
+    }
+
+    const price = productResult.rows[0].price;
+
+    // Проверяем существующий товар в корзине
+    const existingItemResult = await query(
+      `SELECT * FROM "CartItem" 
+       WHERE user_id = $1 
+       AND product_id = $2 
+       AND (size = $3 OR (size IS NULL AND $3 IS NULL))
+       AND (color = $4 OR (color IS NULL AND $4 IS NULL))`,
+      [userId, productId, size || null, color || null]
+    );
 
     let cartItem;
-    if (existingCartItem) {
-        // Если товар с таким же размером и цветом уже есть в корзине, обновляем количество
-        cartItem = await prisma.cartItem.update({
-            where: {
-                 userId_productId_size_color: { // Используем правильный формат составного уникального ключа
-                    userId: userId,
-                    productId: productId,
-                    size: size || null,
-                    color: color || null,
-                }
-            },
-            data: {
-                quantity: existingCartItem.quantity + quantity,
-            },
-        });
+    if (existingItemResult.rows.length > 0) {
+      // Обновляем количество существующего товара
+      const result = await query(
+        `UPDATE "CartItem"
+         SET 
+           quantity = quantity + $1,
+           updated_at = NOW()
+         WHERE id = $2
+         RETURNING *`,
+        [quantity, existingItemResult.rows[0].id]
+      );
+      cartItem = result.rows[0];
     } else {
-        // Если нет, создаем новый элемент корзины
-        cartItem = await prisma.cartItem.create({
-            data: {
-                userId: userId,
-                productId: productId,
-                quantity: quantity,
-                size: size || null,
-                color: color || null,
-            },
-        });
+      // Создаем новый товар в корзине
+      const result = await query(
+        `INSERT INTO "CartItem" (
+          user_id, product_id, quantity, size, color, 
+          price_at_addition, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+        RETURNING *`,
+        [userId, productId, quantity, size || null, color || null, price]
+      );
+      cartItem = result.rows[0];
     }
 
     return NextResponse.json(cartItem, { status: 200 });
-
   } catch (error: any) {
     console.error('Error adding item to cart:', error);
     return new NextResponse(`Internal Server Error: ${error.message}`, { status: 500 });

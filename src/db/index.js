@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { env } from '../lib/env.js';
 
 const { Pool } = pg;
 
@@ -9,11 +10,20 @@ const __dirname = dirname(__filename);
 
 // Create a connection pool to the database
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: env.DATABASE_URL,
+  ssl: env.NODE_ENV === 'production' 
+    ? { rejectUnauthorized: false }
+    : false
 });
+
+// Логируем информацию о подключении (только в режиме разработки)
+if (env.NODE_ENV !== 'production') {
+  console.log('Connecting to database:', {
+    host: new URL(env.DATABASE_URL).hostname,
+    user: new URL(env.DATABASE_URL).username,
+    database: new URL(env.DATABASE_URL).pathname.replace(/^\//, '')
+  });
+}
 
 // Execute a query
 async function query(text, params) {

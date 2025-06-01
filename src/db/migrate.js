@@ -64,5 +64,10 @@ async function migrate() {
   }
 }
 
-// Вызываем функцию миграции
-migrate();
+// Экспортируем функцию миграции
+export { migrate };
+
+// Вызываем функцию миграции, если файл запущен напрямую
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  migrate().catch(console.error);
+}
