@@ -8,10 +8,8 @@
     "vercel-build": "node vercel-build.cjs",
     "start": "next start",
     "lint": "next lint",
-    "db:init": "ts-node --transpile-only -r dotenv/config src/db/init-db.ts",
-    "db:migrate": "ts-node --transpile-only -r dotenv/config src/db/migrate.ts",
-    "db:seed": "ts-node --transpile-only -r dotenv/config src/db/seed.ts",
-    "db:reset": "echo 'Drop all tables manually in your database and then run: npm run db:init'"
+    "db:migrate": "node --experimental-modules --es-module-specifier-resolution=node src/db/migrate.js",
+    "db:seed": "node --experimental-modules --es-module-specifier-resolution=node src/db/seed.js"
   },
   "type": "module",
   "dependencies": {
