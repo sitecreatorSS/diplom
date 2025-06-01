@@ -28,7 +28,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const token = generateToken(user.id, user.role);
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      role: user.role
+    });
 
     return NextResponse.json({
       message: 'Успешный вход',
