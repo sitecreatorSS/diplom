@@ -6,29 +6,14 @@
       "use": "@vercel/next"
     }
   ],
-  "buildCommand": "npm run vercel-build",
-  "installCommand": "npm install",
   "build": {
     "env": {
-      "PRISMA_POSTGRES_PRISMA_URL": "$PRISMA_POSTGRES_PRISMA_URL",
-      "PRISMA_POSTGRES_URL_NON_POOLING": "$PRISMA_POSTGRES_URL_NON_POOLING",
       "NODE_ENV": "production"
     }
   },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "env": {
     "NODE_ENV": "production",
-    "DATABASE_URL": "$PRISMA_POSTGRES_PRISMA_URL"
+    "DATABASE_URL": "$DATABASE_URL"
   },
-  "regions": ["iad1"],
-  "public": true
+  "regions": ["iad1"]
 }
