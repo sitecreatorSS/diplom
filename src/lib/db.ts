@@ -1,12 +1,16 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
 
-async function openDb() {
-  return open({
-    filename: path.join(process.cwd(), 'data', 'dev.sqlite'),
-    driver: sqlite3.Database,
-  });
+// Глобальная переменная для хранения экземпляра Prisma Client
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+// Инициализируем Prisma Client, если он еще не инициализирован
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+// В продакшн-режиме не добавляем в глобальный объект
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
 }
 
-export default openDb; 
+export default prisma;
