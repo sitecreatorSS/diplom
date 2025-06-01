@@ -12,7 +12,8 @@ const nextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     JWT_SECRET: process.env.JWT_SECRET,
-    NODE_ENV: process.env.NODE_ENV || 'production'
+    NODE_ENV: process.env.NODE_ENV || 'production',
+    POSTGRES_URL_NON_POOLING: process.env.POSTGRES_URL_NON_POOLING
   },
   // Отключаем статическую генерацию для API роутов
   experimental: {
@@ -23,6 +24,6 @@ const nextConfig = {
     config.resolve.fallback = { fs: false, path: false };
     return config;
   },
-}
+};
 
-module.exports = nextConfig
+export default nextConfig;
