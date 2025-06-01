@@ -8,14 +8,12 @@
   ],
   "build": {
     "env": {
-      "NODE_ENV": "production",
-      "PRISMA_CLI_QUERY_ENGINE_TYPE": "dataproxy"
+      "NODE_ENV": "production"
     }
   },
   "env": {
     "NODE_ENV": "production",
     "DATABASE_URL": "$DATABASE_URL",
-    "DIRECT_URL": "$DIRECT_URL",
     "NEXTAUTH_SECRET": "$NEXTAUTH_SECRET",
     "NEXTAUTH_URL": "$NEXTAUTH_URL"
   },
