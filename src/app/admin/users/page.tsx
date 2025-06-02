@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { User, Edit, Trash2, Search } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Session } from 'next-auth';
 
 interface UserData {
   id: string;
@@ -15,7 +16,7 @@ interface UserData {
 }
 
 export default function UsersPage() {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: Session | null };
   const router = useRouter();
   const [users, setUsers] = useState<UserData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,7 +102,7 @@ export default function UsersPage() {
   };
 
   // Если пользователь не авторизован или не является администратором, перенаправляем на главную
-  if (session?.user.role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'ADMIN') {
     router.push('/');
     return null;
   }

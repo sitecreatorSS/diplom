@@ -44,12 +44,14 @@ export default function CatalogPage() { // Renamed from Home
         
         const data = await response.json();
         
-        if (!Array.isArray(data)) {
+        // Проверяем, что data - объект и содержит массив products
+        if (!data || typeof data !== 'object' || !Array.isArray(data.products)) {
+          console.error('Неожиданный формат данных API:', data); // Логируем неожиданный формат
           throw new Error('Получены некорректные данные о товарах');
         }
-        
-        console.log('Загружены товары:', data); // Логируем для отладки
-        setProducts(data);
+
+        console.log('Загружены товары:', data.products); // Логируем для отладки
+        setProducts(data.products);
       } catch (err) {
         console.error('Ошибка при получении товаров:', err);
         setError(err instanceof Error ? err.message : 'Произошла ошибка при загрузке каталога');

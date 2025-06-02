@@ -13,10 +13,6 @@ export async function POST(request: Request) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: 'ADMIN' | 'SELLER' | 'BUYER' };
     
-    // Optionally, you might want to fetch the user from the database here
-    // using Prisma if you need more up-to-date user info.
-    // For now, we'll just return the decoded info.
-    
     return NextResponse.json({ user: decoded });
   } catch (error: any) {
     return NextResponse.json({ error: 'Недействительный токен' }, { status: 401 });

@@ -2,8 +2,8 @@ export type UserRole = 'ADMIN' | 'SELLER' | 'BUYER';
 
 export interface BaseEntity {
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface User extends BaseEntity {

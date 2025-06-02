@@ -16,20 +16,22 @@ interface CartItem {
 
 interface CartWidgetProps {
   onClose: () => void;
+  cartData: CartItem[];
 }
 
-export default function CartWidgetNew({ onClose }: CartWidgetProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
+  const [cartItems, setCartItems] = useState<CartItem[]>(cartData);
 
   useEffect(() => {
     console.log('CartWidgetNew: Mount effect running');
-    const storedCart = localStorage.getItem('cart');
-    console.log('CartWidgetNew: Loaded from localStorage', storedCart);
-    if (storedCart) {
-      const parsedCart = JSON.parse(storedCart);
-      console.log('CartWidgetNew: Parsed cart data', parsedCart);
-      setCartItems(parsedCart);
-    }
+    // Удаляем загрузку из localStorage здесь, так как данные приходят через пропсы
+    // const storedCart = localStorage.getItem('cart');
+    // console.log('CartWidgetNew: Loaded from localStorage', storedCart);
+    // if (storedCart) {
+    //   const parsedCart = JSON.parse(storedCart);
+    //   console.log('CartWidgetNew: Parsed cart data', parsedCart);
+    //   setCartItems(parsedCart);
+    // }
      console.log('CartWidgetNew: Mount effect finished, current items state (may be delayed):', cartItems);
   }, []);
 

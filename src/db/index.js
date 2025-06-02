@@ -25,7 +25,13 @@ if (env.NODE_ENV !== 'production') {
   });
 }
 
-// Execute a query
+/**
+ * Execute a query with type safety
+ * @template T
+ * @param {string} text - SQL query text
+ * @param {any[]} [params] - Query parameters
+ * @returns {Promise<pg.QueryResult<T>>}
+ */
 async function query(text, params) {
   const client = await pool.connect();
   try {

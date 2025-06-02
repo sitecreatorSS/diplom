@@ -1,6 +1,14 @@
 import bcrypt from 'bcryptjs';
 import { query } from './index.js';
-import { env } from '../lib/env.js';
+import { QueryResult } from 'pg';
+
+interface UserRow {
+  id: string | number;
+}
+
+interface CategoryRow {
+  id: string | number;
+}
 
 async function seed() {
   console.log('Starting database seeding...');
@@ -25,25 +33,33 @@ async function seed() {
       const adminEmail = 'admin@example.com';
       const adminPassword = await bcrypt.hash('admin123', 10);
       
-      const { rows: existingAdmins } = await query(
+      let adminId: string | number;
+      const existingAdmins = await query<UserRow>(
         'SELECT id FROM "User" WHERE email = $1',
         [adminEmail]
       );
 
-      if (existingAdmins.length === 0) {
+      if (existingAdmins.rows.length === 0) {
         console.log('Creating admin user...');
         await query(
-          `INSERT INTO "User" (email, password, role, name, "emailVerified", created_at, updated_at) 
-           VALUES ($1, $2, 'ADMIN', 'Admin', NOW(), NOW(), NOW())`,
+          `INSERT INTO "User" (email, password, role, name, created_at, updated_at) 
+           VALUES ($1, $2, 'ADMIN', 'Admin', NOW(), NOW())`,
           [adminEmail, adminPassword]
         );
         console.log('Admin user created successfully!');
+        // Получаем id только что созданного пользователя
+        const newAdmin = await query<UserRow>(
+          'SELECT id FROM "User" WHERE email = $1',
+          [adminEmail]
+        );
+        adminId = newAdmin.rows[0].id;
       } else {
         console.log('Admin user already exists, skipping...');
+        adminId = existingAdmins.rows[0].id;
       }
 
       // 3. Добавляем тестовые категории, если их нет
-      const { rows: existingCategories } = await query('SELECT id FROM "Category" LIMIT 1');
+      const { rows: existingCategories } = await query<CategoryRow>('SELECT id FROM "Category" LIMIT 1');
       
       if (existingCategories.length === 0) {
         console.log('Creating categories...');
@@ -64,23 +80,86 @@ async function seed() {
         console.log('Categories already exist, skipping...');
       }
 
+      // 4. Добавляем тестовые товары, если их нет
+      const { rows: existingProducts } = await query<CategoryRow>('SELECT id FROM "Product" LIMIT 1');
+
+      if (existingProducts.length === 0) {
+        console.log('Creating test products...');
+        const products = [
+          {
+            name: 'Футболка', 
+            description: 'Удобная хлопковая футболка', 
+            price: 999.99, 
+            category: 'Одежда', 
+            stock: 50,
+            image: '/placeholder-product.jpg',
+            sellerId: adminId
+          },
+          {
+            name: 'Джинсы', 
+            description: 'Классические синие джинсы', 
+            price: 2999.99, 
+            category: 'Одежда', 
+            stock: 30,
+            image: '/placeholder-product.jpg',
+            sellerId: adminId
+          },
+          {
+            name: 'Кроссовки', 
+            description: 'Стильные спортивные кроссовки', 
+            price: 4999.99, 
+            category: 'Обувь', 
+            stock: 20,
+            image: '/placeholder-product.jpg',
+            sellerId: adminId
+          }
+        ];
+
+        for (const product of products) {
+          // Находим ID категории по названию
+          const categoryRows = await query<CategoryRow>(
+            'SELECT id FROM "Category" WHERE name = $1',
+            [product.category]
+          );
+          const categoryId = categoryRows.rows[0]?.id || null;
+          
+          // Вставляем товар, используя ID категории
+          await query(
+            `INSERT INTO "Product" (name, description, price, category_id, stock, image, seller_id, created_at, updated_at) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())`,
+            [product.name, product.description, product.price, categoryId, product.stock, product.image, product.sellerId]
+          );
+        }
+        console.log('Test products created successfully!');
+      } else {
+        console.log('Test products already exist, skipping...');
+      }
+
       // Фиксируем транзакцию
       await query('COMMIT');
       console.log('Database seeding completed successfully!');
     } catch (error) {
       // В случае ошибки откатываем транзакцию
       await query('ROLLBACK');
+      console.error('Error during seeding:', error);
       throw error;
     }
   } catch (error) {
     console.error('Seeding failed:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     process.exit(1);
   }
 }
 
 // Если файл запущен напрямую, а не импортирован
 if (import.meta.url === `file://${process.argv[1]}`) {
-  seed().catch(console.error);
+  seed().catch(error => {
+    console.error('Unhandled error during seeding:', error);
+    process.exit(1);
+  });
 }
 
 export { seed };

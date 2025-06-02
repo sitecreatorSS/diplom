@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { query } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function PATCH(
   request: Request,
@@ -20,10 +18,15 @@ export async function PATCH(
     const { id: userId } = verifyToken(token);
     const { quantity } = await request.json();
 
-    const cartItem = await prisma.cartItem.findUnique({
-      where: { id: params.id },
-      include: { user: true },
-    });
+    const cartItemResult = await query<{
+      id: string;
+      userId: string;
+      quantity: number;
+    }>(
+      `SELECT id, "userId", quantity FROM "CartItem" WHERE id = $1`,
+      [params.id]
+    );
+    const cartItem = cartItemResult.rows[0];
 
     if (!cartItem || cartItem.userId !== userId) {
       return NextResponse.json(
@@ -33,16 +36,17 @@ export async function PATCH(
     }
 
     if (quantity <= 0) {
-      await prisma.cartItem.delete({
-        where: { id: params.id },
-      });
+      await query(
+        `DELETE FROM "CartItem" WHERE id = $1`,
+        [params.id]
+      );
       return NextResponse.json({ message: 'Товар удален из корзины' });
     }
 
-    await prisma.cartItem.update({
-      where: { id: params.id },
-      data: { quantity },
-    });
+    await query(
+      `UPDATE "CartItem" SET quantity = $1, updated_at = NOW() WHERE id = $2`,
+      [quantity, params.id]
+    );
 
     return NextResponse.json({ message: 'Количество обновлено' });
   } catch (error) {
@@ -69,10 +73,14 @@ export async function DELETE(
 
     const { id: userId } = verifyToken(token);
 
-    const cartItem = await prisma.cartItem.findUnique({
-      where: { id: params.id },
-      include: { user: true },
-    });
+    const cartItemResult = await query<{
+      id: string;
+      userId: string;
+    }>(
+      `SELECT id, "userId" FROM "CartItem" WHERE id = $1`,
+      [params.id]
+    );
+    const cartItem = cartItemResult.rows[0];
 
     if (!cartItem || cartItem.userId !== userId) {
       return NextResponse.json(
@@ -81,9 +89,10 @@ export async function DELETE(
       );
     }
 
-    await prisma.cartItem.delete({
-      where: { id: params.id },
-    });
+    await query(
+      `DELETE FROM "CartItem" WHERE id = $1`,
+      [params.id]
+    );
 
     return NextResponse.json({ message: 'Товар удален из корзины' });
   } catch (error) {

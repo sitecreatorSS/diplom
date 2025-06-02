@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     const total = parseInt(totalResult.rows[0].total, 10);
 
     // Add ordering and limit
-    queryStr += ' ORDER BY "createdAt" DESC';
+    queryStr += ' ORDER BY "created_at" DESC';
     if (limit > 0) {
       queryStr += ` LIMIT $${paramIndex}`;
       params.push(limit);
@@ -96,8 +96,8 @@ export async function GET(request: Request) {
           product.specifications,
           {}
         ),
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
+        createdAt: product.created_at,
+        updatedAt: product.updated_at,
       };
     }));
 

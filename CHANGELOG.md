@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vercel deployment configuration
 
 ### Changed
-- Migrated from Prisma to direct PostgreSQL access with `pg`
 - Updated dependencies to their latest versions
 - Improved error handling and type safety
 - Enhanced security configurations

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { UserRole } from '@prisma/client';
+import { Session } from 'next-auth';
 import { User, LogOut, ShoppingCart, UserCog, Store, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -16,11 +16,50 @@ import {
 import { useState } from 'react';
 import CartWidgetNew from './CartWidgetNew';
 
+interface CustomSession extends Session {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role: 'ADMIN' | 'SELLER' | 'BUYER';
+  };
+}
+
+interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  quantity: number;
+  size: string | null;
+  color: string | null;
+}
+
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: CustomSession | null };
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartDataFromStorage, setCartDataFromStorage] = useState<CartItem[]>([]);
 
   const toggleCart = () => {
+    if (!isCartOpen) {
+      const storedCart = localStorage.getItem('cart');
+      if (storedCart) {
+        try {
+          const parsedCart = JSON.parse(storedCart);
+          const cartItemsWithParsedPrice = parsedCart.map((item: CartItem) => ({
+            ...item,
+            price: parseFloat(item.price as any),
+          }));
+          setCartDataFromStorage(cartItemsWithParsedPrice);
+        } catch (error) {
+          console.error('Failed to parse cart data from localStorage:', error);
+          setCartDataFromStorage([]); // Очистить корзину при ошибке парсинга
+        }
+      } else {
+        setCartDataFromStorage([]); // Корзина пуста в localStorage
+      }
+    }
     setIsCartOpen(!isCartOpen);
   };
   
@@ -44,11 +83,6 @@ export default function Navbar() {
               <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
                 О нас
               </Link>
-              {session?.user.role === 'ADMIN' && (
-                <Link href="/admin/users" className="text-gray-300 hover:text-white transition-colors">
-                  Админ Панель
-                </Link>
-              )}
             </div>
           </div>
 
@@ -74,7 +108,7 @@ export default function Navbar() {
                         <p className="text-sm font-medium leading-none">
                           {session.user.name || 'Пользователь'}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground">
+                        <p className="text-xs leading-none text-gray-700 dark:text-gray-300">
                           {session.user.email}
                         </p>
                       </div>
@@ -87,7 +121,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     </Link>
 
-                    {session.user.role === 'ADMIN' && (
+                    {session.user?.role === 'ADMIN' && (
                       <Link href="/admin">
                         <DropdownMenuItem className="cursor-pointer">
                           <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -96,7 +130,7 @@ export default function Navbar() {
                       </Link>
                     )}
 
-                    {session.user.role === 'SELLER' && (
+                    {session.user?.role === 'SELLER' && (
                       <Link href="/seller">
                         <DropdownMenuItem className="cursor-pointer">
                           <Store className="mr-2 h-4 w-4" />
@@ -129,7 +163,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {isCartOpen && <CartWidgetNew onClose={() => setIsCartOpen(false)} />}
+      {isCartOpen && <CartWidgetNew onClose={() => setIsCartOpen(false)} cartData={cartDataFromStorage} />}
     </nav>
   );
 }

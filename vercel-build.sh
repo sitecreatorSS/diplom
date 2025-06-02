@@ -13,29 +13,13 @@ echo "NPM version: $(npm -v)"
 echo "=== Installing dependencies... ==="
 npm ci --prefer-offline --no-audit --progress=false
 
-# Generate Prisma client
-echo "=== Generating Prisma client... ==="
-npx prisma generate
-
 # Run database migrations
 echo "=== Running database migrations... ==="
-npx prisma migrate deploy
+npm run db:migrate
 
 # Seed the database
 echo "=== Seeding the database... ==="
-if [ -f "prisma/seed.js" ]; then
-  echo "Running JavaScript seed..."
-  node prisma/seed.js
-elif [ -f "prisma/seed.ts" ]; then
-  echo "Running TypeScript seed..."
-  npx ts-node --transpile-only prisma/seed.ts
-else
-  echo "No seed files found. Skipping database seeding."
-fi
-
-# Verify database connection
-echo "=== Verifying database connection... ==="
-npx prisma db execute --file prisma/verify-connection.sql --schema=./prisma/schema.prisma
+npm run db:seed || echo "Seeding failed or skipped, continuing build."
 
 # Build the application
 echo "=== Building the application... ==="

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, UserRole } from '@prisma/client';
+import { UserRole, Product } from '@/types/database';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
+import { query } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -16,17 +15,27 @@ export async function GET(request: Request) {
 
     const { id: userId, role } = verifyToken(token);
 
-    if (role !== UserRole.SELLER && role !== UserRole.ADMIN) {
+    if (role !== 'SELLER' && role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Недостаточно прав' },
         { status: 403 }
       );
     }
 
-    const products = await prisma.product.findMany({
-      where: { sellerId: userId },
-      orderBy: { createdAt: 'desc' },
-    });
+    const result = await query<Product>(
+      `SELECT * 
+       FROM "Product" 
+       WHERE "sellerId" = $1 
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    const products = result.rows.map(row => ({
+      ...row,
+      created_at: new Date(row.created_at),
+      updated_at: new Date(row.updated_at),
+      specifications: typeof row.specifications === 'string' ? JSON.parse(row.specifications) : row.specifications
+    }));
 
     return NextResponse.json(products);
   } catch (error) {

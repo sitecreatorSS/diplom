@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { query } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
@@ -16,19 +14,42 @@ export async function GET(request: Request) {
 
     const { id: userId } = verifyToken(token);
 
-    const items = await prisma.cartItem.findMany({
-      where: { userId },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            images: true,
-          },
-        },
-      },
-    });
+    const result = await query<{
+      id: string;
+      userId: string;
+      productId: string;
+      quantity: number;
+      priceAtAddition: number;
+      product_id: string;
+      product_name: string;
+      product_price: number;
+      product_images: string;
+    }>(
+      `SELECT 
+         ci.*,\n
+         p.id as product_id,\n
+         p.name as product_name,\n
+         p.price as product_price,\n
+         p.image as product_images
+       FROM "CartItem" ci\n
+       JOIN "Product" p ON ci."productId" = p.id\n
+       WHERE ci."userId" = $1`, 
+      [userId]
+    );
+
+    const items = result.rows.map(row => ({
+       id: row.id,
+       userId: row.userId,
+       productId: row.productId,
+       quantity: row.quantity,
+       priceAtAddition: row.priceAtAddition,
+       product: {
+          id: row.product_id,
+          name: row.product_name,
+          price: row.product_price,
+          images: row.product_images ? [{ url: row.product_images, alt: 'Product Image' }] : [],
+       }
+    }));
 
     return NextResponse.json({ items });
   } catch (error) {
@@ -57,39 +78,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Некорректные данные' }, { status: 400 });
     }
 
-    const existingCartItem = await prisma.cartItem.findUnique({
-      where: {
-        userId_productId_size_color: {
-          userId,
-          productId,
-          size: size || null,
-          color: color || null,
-        },
-      },
-    });
+    const existingCartItemResult = await query<{
+       id: string;
+       quantity: number;
+    }>(
+       `SELECT id, quantity
+        FROM "CartItem"
+        WHERE "userId" = $1 AND "productId" = $2 AND size ${size ? '= $3' : 'IS NULL'} AND color ${color ? '= $4' : 'IS NULL'}`,
+       [userId, productId].concat(size ? [size] : []).concat(color ? [color] : [])
+    );
+    const existingCartItem = existingCartItemResult.rows[0];
 
     if (existingCartItem) {
-      await prisma.cartItem.update({
-        where: {
-          userId_productId_size_color: {
-            userId,
-            productId,
-            size: size || null,
-            color: color || null,
-          },
-        },
-        data: { quantity: existingCartItem.quantity + quantity },
-      });
+      await query(
+        `UPDATE "CartItem"
+         SET quantity = quantity + $1, updated_at = NOW()
+         WHERE id = $2`,
+        [quantity, existingCartItem.id]
+      );
     } else {
-      await prisma.cartItem.create({
-        data: {
-          userId,
-          productId,
-          quantity,
-          size: size || null,
-          color: color || null,
-        },
-      });
+      const productPriceResult = await query<{ price: number }>(
+        `SELECT price FROM "Product" WHERE id = $1`,
+        [productId]
+      );
+      const priceAtAddition = productPriceResult.rows[0]?.price || 0;
+
+      await query(
+        `INSERT INTO "CartItem" ("userId", "productId", quantity, size, color, "priceAtAddition", created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
+        [userId, productId, quantity, size || null, color || null, priceAtAddition]
+      );
     }
 
     return NextResponse.json({ message: 'Товар добавлен в корзину' });

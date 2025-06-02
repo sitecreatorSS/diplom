@@ -41,7 +41,7 @@ export async function createUser(userData: UserCreateInput): Promise<User> {
   const result = await query(
     `INSERT INTO "User" (
       email, name, password, role, image, phone, 
-      address, city, country, "postalCode", "isActive"
+      address, city, country, "postal_code", "is_active"
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
     RETURNING *`,
     [
@@ -93,7 +93,7 @@ export async function updateUser(
        address = COALESCE($6, address),
        city = COALESCE($7, city),
        country = COALESCE($8, country),
-       "postalCode" = COALESCE($9, "postalCode"),
+       "postal_code" = COALESCE($9, "postal_code"),
        "isActive" = COALESCE($10, "isActive"),
        "updatedAt" = NOW()
      WHERE id = ${image === undefined ? '$5' : '$11'}
