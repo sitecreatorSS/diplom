@@ -1,11 +1,14 @@
 -- Создание перечисляемых типов (ENUM)
-DO $$ BEGIN
+DO $$ 
+BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
         CREATE TYPE user_role AS ENUM ('ADMIN', 'SELLER', 'BUYER');
     END IF;
-END $$;
+END
+$$;
 
-DO $$ BEGIN
+DO $$ 
+BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
         CREATE TYPE order_status AS ENUM (
             'PENDING_PAYMENT',
@@ -17,7 +20,8 @@ DO $$ BEGIN
             'REFUNDED'
         );
     END IF;
-END $$;
+END
+$$;
 
 -- Таблица пользователей
 CREATE TABLE IF NOT EXISTS "User" (
