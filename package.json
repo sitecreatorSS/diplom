@@ -8,8 +8,8 @@
     "vercel-build": "node vercel-build.cjs",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' ts-node --transpile-only src/db/migrate.ts",
-    "db:seed": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' ts-node --transpile-only src/db/seed.ts",
+    "db:migrate": "node --loader ts-node/esm src/db/migrate.ts",
+    "db:seed": "node --loader ts-node/esm src/db/seed.ts",
     "db:reset": "npm run db:migrate && npm run db:seed",
     "type-check": "tsc --noEmit"
   },

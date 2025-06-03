@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const { join } = require('path');
 require('dotenv').config({ override: true });
 
@@ -49,13 +49,38 @@ async function run() {
 
     console.log('Running database migrations...');
     try {
-      // Затем запускаем миграции
-      execSync('npm run db:migrate', { 
-        stdio: 'inherit',
+      // Запускаем миграции через spawn для лучшей обработки ошибок
+      const migrateProcess = spawn('npm', ['run', 'db:migrate'], {
         env: {
           ...env,
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
-        }
+        },
+        stdio: ['inherit', 'pipe', 'pipe']
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      migrateProcess.stdout.on('data', (data) => {
+        const output = data.toString();
+        stdout += output;
+        console.log(output);
+      });
+
+      migrateProcess.stderr.on('data', (data) => {
+        const output = data.toString();
+        stderr += output;
+        console.error(output);
+      });
+
+      await new Promise((resolve, reject) => {
+        migrateProcess.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`Migration failed with code ${code}\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`));
+          }
+        });
       });
     } catch (error) {
       console.error('Error running migrations:', {
@@ -71,12 +96,38 @@ async function run() {
 
     console.log('Seeding database...');
     try {
-      execSync('npm run db:seed', { 
-        stdio: 'inherit',
+      // Запускаем сидинг через spawn для лучшей обработки ошибок
+      const seedProcess = spawn('npm', ['run', 'db:seed'], {
         env: {
           ...env,
           NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
-        }
+        },
+        stdio: ['inherit', 'pipe', 'pipe']
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      seedProcess.stdout.on('data', (data) => {
+        const output = data.toString();
+        stdout += output;
+        console.log(output);
+      });
+
+      seedProcess.stderr.on('data', (data) => {
+        const output = data.toString();
+        stderr += output;
+        console.error(output);
+      });
+
+      await new Promise((resolve, reject) => {
+        seedProcess.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`Seeding failed with code ${code}\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`));
+          }
+        });
       });
     } catch (error) {
       console.error('Error seeding database:', {
