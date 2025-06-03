@@ -4,6 +4,17 @@ require('dotenv').config({ override: true });
 console.log('DEBUG POSTGRES_URL_NON_POOLING:', process.env.POSTGRES_URL_NON_POOLING);
 console.log('DEBUG DATABASE_URL:', process.env.DATABASE_URL);
 
+// Проверяем формат URL базы данных
+function validateDatabaseUrl(url) {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'postgresql:' || parsed.protocol === 'postgres:';
+  } catch (e) {
+    return false;
+  }
+}
+
 async function run() {
   try {
     // Проверяем наличие необходимых переменных окружения
@@ -23,6 +34,15 @@ async function run() {
       throw new Error(
         `Missing required environment variables: ${missingEnvVars.join(', ')}`
       );
+    }
+
+    // Проверяем формат URL базы данных
+    if (!validateDatabaseUrl(process.env.DATABASE_URL)) {
+      throw new Error('Invalid DATABASE_URL format');
+    }
+
+    if (!validateDatabaseUrl(process.env.POSTGRES_URL_NON_POOLING)) {
+      throw new Error('Invalid POSTGRES_URL_NON_POOLING format');
     }
 
     console.log('Environment variables:');
