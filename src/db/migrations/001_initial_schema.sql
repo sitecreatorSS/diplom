@@ -1,14 +1,23 @@
 -- Создание перечисляемых типов (ENUM)
-CREATE TYPE user_role AS ENUM ('ADMIN', 'SELLER', 'BUYER');
-CREATE TYPE order_status AS ENUM (
-  'PENDING_PAYMENT',
-  'PAYMENT_RECEIVED',
-  'PROCESSING',
-  'SHIPPED',
-  'DELIVERED',
-  'CANCELLED',
-  'REFUNDED'
-);
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM ('ADMIN', 'SELLER', 'BUYER');
+    END IF;
+END $$;
+
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
+        CREATE TYPE order_status AS ENUM (
+            'PENDING_PAYMENT',
+            'PAYMENT_RECEIVED',
+            'PROCESSING',
+            'SHIPPED',
+            'DELIVERED',
+            'CANCELLED',
+            'REFUNDED'
+        );
+    END IF;
+END $$;
 
 -- Таблица пользователей
 CREATE TABLE IF NOT EXISTS "User" (

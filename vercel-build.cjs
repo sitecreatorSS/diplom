@@ -1,9 +1,58 @@
 const { execSync, spawn } = require('child_process');
 const { join } = require('path');
 require('dotenv').config({ override: true });
+const { Pool } = require('pg');
 
 console.log('DEBUG POSTGRES_URL_NON_POOLING:', process.env.POSTGRES_URL_NON_POOLING);
 console.log('DEBUG DATABASE_URL:', process.env.DATABASE_URL);
+
+async function checkMigrationsNeeded() {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+
+  try {
+    const client = await pool.connect();
+    try {
+      // Проверяем, существует ли таблица migrations
+      const { rows: tableExists } = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_name = 'migrations'
+        );
+      `);
+
+      if (!tableExists[0].exists) {
+        console.log('Migrations table does not exist, migrations needed');
+        return true;
+      }
+
+      // Проверяем, есть ли уже примененные миграции
+      const { rows: migrations } = await client.query(`
+        SELECT COUNT(*) as count FROM migrations;
+      `);
+
+      if (migrations[0].count === '0') {
+        console.log('No migrations applied yet, migrations needed');
+        return true;
+      }
+
+      console.log('Migrations already applied, skipping...');
+      return false;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Error checking migrations:', error);
+    // В случае ошибки, лучше пропустить миграции
+    return false;
+  } finally {
+    await pool.end();
+  }
+}
 
 async function run() {
   try {
@@ -45,48 +94,53 @@ async function run() {
       NODE_ENV: 'production',
     };
 
-    console.log('Running database migrations...');
-    try {
-      // Запускаем миграции через spawn для лучшей обработки ошибок
-      const migrateProcess = spawn('npx', ['tsx', 'src/db/migrate.ts'], {
-        env,
-        stdio: ['inherit', 'pipe', 'pipe']
-      });
+    // Проверяем, нужны ли миграции
+    const migrationsNeeded = await checkMigrationsNeeded();
 
-      let stdout = '';
-      let stderr = '';
-
-      migrateProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        stdout += output;
-        console.log(output);
-      });
-
-      migrateProcess.stderr.on('data', (data) => {
-        const output = data.toString();
-        stderr += output;
-        console.error(output);
-      });
-
-      await new Promise((resolve, reject) => {
-        migrateProcess.on('close', (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(new Error(`Migration failed with code ${code}\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`));
-          }
+    if (migrationsNeeded) {
+      console.log('Running database migrations...');
+      try {
+        // Запускаем миграции через spawn для лучшей обработки ошибок
+        const migrateProcess = spawn('npx', ['tsx', 'src/db/migrate.ts'], {
+          env,
+          stdio: ['inherit', 'pipe', 'pipe']
         });
-      });
-    } catch (error) {
-      console.error('Error running migrations:', {
-        message: error.message,
-        code: error.code,
-        signal: error.signal,
-        stdout: error.stdout?.toString(),
-        stderr: error.stderr?.toString(),
-        stack: error.stack
-      });
-      process.exit(1);
+
+        let stdout = '';
+        let stderr = '';
+
+        migrateProcess.stdout.on('data', (data) => {
+          const output = data.toString();
+          stdout += output;
+          console.log(output);
+        });
+
+        migrateProcess.stderr.on('data', (data) => {
+          const output = data.toString();
+          stderr += output;
+          console.error(output);
+        });
+
+        await new Promise((resolve, reject) => {
+          migrateProcess.on('close', (code) => {
+            if (code === 0) {
+              resolve();
+            } else {
+              reject(new Error(`Migration failed with code ${code}\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`));
+            }
+          });
+        });
+      } catch (error) {
+        console.error('Error running migrations:', {
+          message: error.message,
+          code: error.code,
+          signal: error.signal,
+          stdout: error.stdout?.toString(),
+          stderr: error.stderr?.toString(),
+          stack: error.stack
+        });
+        process.exit(1);
+      }
     }
 
     console.log('Seeding database...');
