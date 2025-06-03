@@ -8,8 +8,8 @@
     "vercel-build": "node vercel-build.cjs",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "node --loader ts-node/esm src/db/migrate.ts",
-    "db:seed": "node --loader ts-node/esm src/db/seed.ts",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seed.ts",
     "db:reset": "npm run db:migrate && npm run db:seed",
     "type-check": "tsc --noEmit"
   },
@@ -40,7 +40,7 @@
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.8.3",
     "zod": "^3.23.8"
   },

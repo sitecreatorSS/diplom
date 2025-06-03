@@ -13,7 +13,6 @@ async function run() {
       env: { 
         ...process.env, 
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
       }
     });
 
@@ -44,17 +43,13 @@ async function run() {
     const env = {
       ...process.env,
       NODE_ENV: 'production',
-      NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
     };
 
     console.log('Running database migrations...');
     try {
       // Запускаем миграции через spawn для лучшей обработки ошибок
-      const migrateProcess = spawn('npm', ['run', 'db:migrate'], {
-        env: {
-          ...env,
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
-        },
+      const migrateProcess = spawn('npx', ['tsx', 'src/db/migrate.ts'], {
+        env,
         stdio: ['inherit', 'pipe', 'pipe']
       });
 
@@ -97,11 +92,8 @@ async function run() {
     console.log('Seeding database...');
     try {
       // Запускаем сидинг через spawn для лучшей обработки ошибок
-      const seedProcess = spawn('npm', ['run', 'db:seed'], {
-        env: {
-          ...env,
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
-        },
+      const seedProcess = spawn('npx', ['tsx', 'src/db/seed.ts'], {
+        env,
         stdio: ['inherit', 'pipe', 'pipe']
       });
 
@@ -144,10 +136,7 @@ async function run() {
     console.log('Building Next.js application...');
     execSync('npm run build', { 
       stdio: 'inherit',
-      env: { 
-        ...env,
-        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
-      }
+      env
     });
 
     console.log('Build completed successfully!');
