@@ -49,9 +49,13 @@ async function run() {
 
     console.log('Running database migrations...');
     try {
+      // Затем запускаем миграции
       execSync('npm run db:migrate', { 
         stdio: 'inherit',
-        env
+        env: {
+          ...env,
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+        }
       });
     } catch (error) {
       console.error('Error running migrations:', error);
@@ -62,7 +66,10 @@ async function run() {
     try {
       execSync('npm run db:seed', { 
         stdio: 'inherit',
-        env
+        env: {
+          ...env,
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+        }
       });
     } catch (error) {
       console.error('Error seeding database:', error);
