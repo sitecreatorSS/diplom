@@ -16,6 +16,12 @@ const pool = new Pool({
     : false
 });
 
+// Проверяем подключение к базе данных
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
+
 // Логируем информацию о подключении (только в режиме разработки)
 if (env.NODE_ENV !== 'production') {
   console.log('Connecting to database:', {
@@ -37,6 +43,9 @@ async function query(text, params) {
   try {
     const res = await client.query(text, params);
     return res;
+  } catch (error) {
+    console.error('Error executing query:', error);
+    throw error;
   } finally {
     client.release();
   }
@@ -58,6 +67,7 @@ async function transaction(queries) {
     return results;
   } catch (e) {
     await client.query('ROLLBACK');
+    console.error('Transaction failed:', e);
     throw e;
   } finally {
     client.release();

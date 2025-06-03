@@ -23,31 +23,14 @@ export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>(cartData);
 
   useEffect(() => {
-    console.log('CartWidgetNew: Mount effect running');
-    // Удаляем загрузку из localStorage здесь, так как данные приходят через пропсы
-    // const storedCart = localStorage.getItem('cart');
-    // console.log('CartWidgetNew: Loaded from localStorage', storedCart);
-    // if (storedCart) {
-    //   const parsedCart = JSON.parse(storedCart);
-    //   console.log('CartWidgetNew: Parsed cart data', parsedCart);
-    //   setCartItems(parsedCart);
-    // }
-     console.log('CartWidgetNew: Mount effect finished, current items state (may be delayed):', cartItems);
-  }, []);
-
-  useEffect(() => {
-    console.log('CartWidgetNew: cartItems state changed', cartItems);
     localStorage.setItem('cart', JSON.stringify(cartItems));
-     console.log('CartWidgetNew: Saved to localStorage', JSON.stringify(cartItems));
   }, [cartItems]);
 
   const updateQuantity = (productId: string, size: string | null, color: string | null, delta: number) => {
-    console.log('CartWidgetNew: Calling updateQuantity', { productId, size, color, delta });
-    setCartItems(currentItems =>
-      currentItems.map(item => {
+    setCartItems((currentItems: CartItem[]) =>
+      currentItems.map((item: CartItem) => {
         if (item.productId === productId && item.size === size && item.color === color) {
           const newQuantity = item.quantity + delta;
-          console.log('CartWidgetNew: Updating quantity for item', { item, newQuantity });
           return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
         }
         return item;
@@ -56,16 +39,15 @@ export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
   };
 
   const removeItem = (productId: string, size: string | null, color: string | null) => {
-    console.log('CartWidgetNew: Calling removeItem', { productId, size, color });
-    setCartItems(currentItems =>
+    setCartItems((currentItems: CartItem[]) =>
       currentItems.filter(
-        item => !(item.productId === productId && item.size === size && item.color === color)
+        (item: CartItem) => !(item.productId === productId && item.size === size && item.color === color)
       )
     );
   };
 
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getTotalPrice = (): number => {
+    return cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0);
   };
 
   return (

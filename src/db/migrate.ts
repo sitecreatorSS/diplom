@@ -1,5 +1,5 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { query } from './index.js';
 import { env } from '../lib/env.js';
 import { readdir, readFile } from '../lib/fs-utils.js';
@@ -72,13 +72,21 @@ async function migrate() {
     console.log('All migrations completed successfully!');
   } catch (error) {
     console.error('Migration failed:', error);
-    process.exit(1);
+    throw error;
   }
 }
 
 // Если файл запущен напрямую, а не импортирован
 if (import.meta.url === `file://${process.argv[1]}`) {
-  migrate().catch(console.error);
+  migrate()
+    .then(() => {
+      console.log('Migrations completed successfully');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Migration failed:', error);
+      process.exit(1);
+    });
 }
 
 export { migrate };

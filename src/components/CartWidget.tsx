@@ -77,10 +77,52 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
           {cartItems.length === 0 ? (
             <div className="text-center text-gray-500">Ваша корзина пуста</div>
           ) : (
-            <ul className="space-y-4 border border-red-500 p-2">
+            <ul className="space-y-4">
               {cartItems.map((item) => (
-                <li key={`${item.productId}-${item.size}-${item.color}`} className="flex items-center border-b pb-4 last:border-b-0 last:pb-0 border border-blue-500">
-                  <p className="text-gray-900">{item.name} - {item.quantity} шт.</p>
+                <li 
+                  key={`${item.productId}-${item.size}-${item.color}`} 
+                  className="flex gap-4 border-b pb-4 last:border-b-0 last:pb-0"
+                >
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.name}
+                    className="h-20 w-20 object-cover rounded"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-900">{item.name}</h3>
+                    <p className="text-sm text-gray-600">
+                      {item.price.toFixed(2)} ₽
+                    </p>
+                    {(item.size || item.color) && (
+                      <p className="text-sm text-gray-500">
+                        {item.size && `Размер: ${item.size}`}
+                        {item.size && item.color && ', '}
+                        {item.color && `Цвет: ${item.color}`}
+                      </p>
+                    )}
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        onClick={() => updateQuantity(item.productId, item.size, item.color, -1)}
+                        className="rounded border p-1 hover:bg-gray-100"
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.productId, item.size, item.color, 1)}
+                        className="rounded border p-1 hover:bg-gray-100"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => removeItem(item.productId, item.size, item.color)}
+                        className="ml-auto text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

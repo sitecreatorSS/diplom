@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Session } from 'next-auth';
-import { User, LogOut, ShoppingCart, UserCog, Store, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, ShoppingCart, Store, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -46,24 +46,22 @@ export default function Navbar() {
       const storedCart = localStorage.getItem('cart');
       if (storedCart) {
         try {
-          const parsedCart = JSON.parse(storedCart);
-          const cartItemsWithParsedPrice = parsedCart.map((item: CartItem) => ({
+          const parsedCart = JSON.parse(storedCart) as CartItem[];
+          const cartItemsWithParsedPrice = parsedCart.map((item) => ({
             ...item,
-            price: parseFloat(item.price as any),
+            price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
           }));
           setCartDataFromStorage(cartItemsWithParsedPrice);
         } catch (error) {
           console.error('Failed to parse cart data from localStorage:', error);
-          setCartDataFromStorage([]); // Очистить корзину при ошибке парсинга
+          setCartDataFromStorage([]);
         }
       } else {
-        setCartDataFromStorage([]); // Корзина пуста в localStorage
+        setCartDataFromStorage([]);
       }
     }
     setIsCartOpen(!isCartOpen);
   };
-  
-  const userRole = session?.user?.role || 'BUYER';
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -77,10 +75,10 @@ export default function Navbar() {
             </Link>
 
             <div className="hidden md:flex space-x-8">
-              <Link href="/catalog" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/catalog" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Каталог
               </Link>
-              <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
                 О нас
               </Link>
             </div>
@@ -121,7 +119,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     </Link>
 
-                    {session.user?.role === 'ADMIN' && (
+                    {session.user.role === 'ADMIN' && (
                       <Link href="/admin">
                         <DropdownMenuItem className="cursor-pointer">
                           <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -130,7 +128,7 @@ export default function Navbar() {
                       </Link>
                     )}
 
-                    {session.user?.role === 'SELLER' && (
+                    {session.user.role === 'SELLER' && (
                       <Link href="/seller">
                         <DropdownMenuItem className="cursor-pointer">
                           <Store className="mr-2 h-4 w-4" />
