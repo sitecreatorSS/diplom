@@ -54,11 +54,18 @@ async function run() {
         stdio: 'inherit',
         env: {
           ...env,
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
         }
       });
     } catch (error) {
-      console.error('Error running migrations:', error);
+      console.error('Error running migrations:', {
+        message: error.message,
+        code: error.code,
+        signal: error.signal,
+        stdout: error.stdout?.toString(),
+        stderr: error.stderr?.toString(),
+        stack: error.stack
+      });
       process.exit(1);
     }
 
@@ -68,11 +75,18 @@ async function run() {
         stdio: 'inherit',
         env: {
           ...env,
-          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+          NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
         }
       });
     } catch (error) {
-      console.error('Error seeding database:', error);
+      console.error('Error seeding database:', {
+        message: error.message,
+        code: error.code,
+        signal: error.signal,
+        stdout: error.stdout?.toString(),
+        stderr: error.stderr?.toString(),
+        stack: error.stack
+      });
       // Продолжаем выполнение, даже если сидинг не удался
     }
 
@@ -81,14 +95,21 @@ async function run() {
       stdio: 'inherit',
       env: { 
         ...env,
-        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node --no-warnings',
+        NODE_OPTIONS: '--experimental-modules --es-module-specifier-resolution=node',
       }
     });
 
     console.log('Build completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('Build failed:', error);
+    console.error('Build failed:', {
+      message: error.message,
+      code: error.code,
+      signal: error.signal,
+      stdout: error.stdout?.toString(),
+      stderr: error.stderr?.toString(),
+      stack: error.stack
+    });
     process.exit(1);
   }
 }
