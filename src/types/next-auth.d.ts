@@ -1,19 +1,21 @@
-import NextAuth, { DefaultSession } from 'next-auth';
+import 'next-auth';
+import { UserRole } from '@/types/db';
 
 declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      role: 'ADMIN' | 'SELLER' | 'BUYER';
-    } & DefaultSession['user'];
+      email: string;
+      name: string;
+      role: UserRole;
+    };
   }
 
   interface User {
     id: string;
-    role: 'ADMIN' | 'SELLER' | 'BUYER';
+    email: string;
+    name: string;
+    role: UserRole;
   }
 }
 
