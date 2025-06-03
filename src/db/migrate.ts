@@ -1,92 +1,85 @@
-import path from 'node:path';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { query } from './index.js';
-import { env } from '../lib/env.js';
-import { readdir, readFile } from '../lib/fs-utils.js';
+import { pool } from './index.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 async function migrate() {
-  console.log('Starting migrations...');
-  
   try {
-    // Проверяем существование таблицы миграций
-    await query(`
-      CREATE TABLE IF NOT EXISTS "_migrations" (
+    console.log('Starting database migration...');
+    
+    // Создаем таблицу для отслеживания миграций, если она не существует
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS migrations (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL UNIQUE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
+        applied_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
-    // Получаем список выполненных миграций
-    const { rows } = await query('SELECT name FROM "_migrations"');
-    // Безопасно приводим тип, проверяя структуру данных
-    const completedMigrations = (Array.isArray(rows) ? rows : []).flat().filter(
-      (row): row is { name: string } => 
-        typeof row === 'object' && 
-        row !== null && 
-        'name' in row && 
-        typeof (row as { name: unknown }).name === 'string'
+    // Получаем список уже примененных миграций
+    const { rows: appliedMigrations } = await pool.query<{ name: string }>(
+      'SELECT name FROM migrations ORDER BY id;'
     );
-    const completedMigrationNames = new Set(completedMigrations.map(m => m.name));
+    const appliedMigrationNames = new Set(appliedMigrations.map(m => m.name));
 
     // Получаем список файлов миграций
-    const migrationsDir = path.join(__dirname, 'migrations');
+    const migrationsDir = join(__dirname, 'migrations');
     const files = await readdir(migrationsDir);
     const migrationFiles = files
-      .filter((file: string) => file.endsWith('.sql'))
+      .filter(f => f.endsWith('.sql'))
       .sort();
 
-    // Применяем новые миграции
-    for (const fileName of migrationFiles) {
-      if (!completedMigrationNames.has(fileName)) {
-        console.log(`Applying migration: ${fileName}`);
+    console.log(`Found ${migrationFiles.length} migration files`);
+
+    // Применяем каждую миграцию
+    for (const file of migrationFiles) {
+      if (appliedMigrationNames.has(file)) {
+        console.log(`Skipping already applied migration: ${file}`);
+        continue;
+      }
+
+      console.log(`Applying migration: ${file}`);
+      const filePath = join(migrationsDir, file);
+      const sql = await readFile(filePath, 'utf-8');
+
+      // Начинаем транзакцию
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
         
-        const migrationPath = path.join(migrationsDir, fileName);
-        const migrationSQL = await readFile(migrationPath);
+        // Выполняем миграцию
+        await client.query(sql);
         
-        // Начинаем транзакцию
-        await query('BEGIN');
+        // Записываем информацию о примененной миграции
+        await client.query(
+          'INSERT INTO migrations (name) VALUES ($1)',
+          [file]
+        );
         
-        try {
-          // Выполняем SQL из файла миграции
-          await query(migrationSQL);
-          
-          // Записываем выполненную миграцию
-          await query('INSERT INTO "_migrations" (name) VALUES ($1)', [fileName]);
-          
-          // Фиксируем транзакцию
-          await query('COMMIT');
-          console.log(`✔ Successfully applied migration: ${fileName}`);
-        } catch (error) {
-          // В случае ошибки откатываем транзакцию
-          await query('ROLLBACK');
-          console.error(`✖ Failed to apply migration ${fileName}:`, error);
-          throw error;
-        }
+        await client.query('COMMIT');
+        console.log(`Successfully applied migration: ${file}`);
+      } catch (error) {
+        await client.query('ROLLBACK');
+        console.error(`Error applying migration ${file}:`, error);
+        throw error;
+      } finally {
+        client.release();
       }
     }
-    
-    console.log('All migrations completed successfully!');
+
+    console.log('Database migration completed successfully');
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;
+  } finally {
+    await pool.end();
   }
 }
 
-// Если файл запущен напрямую, а не импортирован
-if (import.meta.url === `file://${process.argv[1]}`) {
-  migrate()
-    .then(() => {
-      console.log('Migrations completed successfully');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('Migration failed:', error);
-      process.exit(1);
-    });
-}
-
-export { migrate };
+// Запускаем миграцию
+migrate().catch(error => {
+  console.error('Migration script failed:', error);
+  process.exit(1);
+});
