@@ -36,7 +36,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Качество</h3>
-                <p className="text-gray-600">Мы используем только лучшие материалы и тщательно контролируем каждый этап производства</p>
+                <p className="text-gray-800">Мы используем только лучшие материалы и тщательно контролируем каждый этап производства</p>
               </div>
               <div className="text-center">
                 <div className="bg-blue-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -45,7 +45,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Надежность</h3>
-                <p className="text-gray-600">Мы ценим время наших клиентов и всегда выполняем свои обязательства</p>
+                <p className="text-gray-800">Мы ценим время наших клиентов и всегда выполняем свои обязательства</p>
               </div>
               <div className="text-center">
                 <div className="bg-blue-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -54,7 +54,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Забота</h3>
-                <p className="text-gray-600">Мы заботимся о комфорте наших клиентов и окружающей среде</p>
+                <p className="text-gray-800">Мы заботимся о комфорте наших клиентов и окружающей среде</p>
               </div>
             </div>
           </section>

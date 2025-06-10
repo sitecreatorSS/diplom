@@ -75,10 +75,10 @@ export default function Navbar() {
             </Link>
 
             <div className="hidden md:flex space-x-8">
-              <Link href="/catalog" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/catalog" className="text-gray-800 hover:text-gray-900 transition-colors">
                 Каталог
               </Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/about" className="text-gray-800 hover:text-gray-900 transition-colors">
                 О нас
               </Link>
             </div>

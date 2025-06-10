@@ -99,7 +99,7 @@ export default function RegisterPage() {
           <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Создать аккаунт
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-800">
             Уже есть аккаунт?{' '}
             <Link href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500">
               Войти
