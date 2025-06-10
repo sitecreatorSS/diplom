@@ -86,7 +86,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button onClick={toggleCart} className="p-2 rounded-full hover:bg-gray-100">
-              <ShoppingCart className="h-5 w-5 text-gray-700" />
+              <ShoppingCart className="h-5 w-5 text-black dark:text-white" />
             </button>
 
             {session ? (
@@ -106,7 +106,7 @@ export default function Navbar() {
                         <p className="text-sm font-medium leading-none">
                           {session.user.name || 'Пользователь'}
                         </p>
-                        <p className="text-xs leading-none text-gray-700 dark:text-gray-300">
+                        <p className="text-xs leading-none text-black dark:text-white">
                           {session.user.email}
                         </p>
                       </div>

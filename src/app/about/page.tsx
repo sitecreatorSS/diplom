@@ -7,7 +7,7 @@ export default function AboutPage() {
         {/* Заголовок */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">О нашей компании</h1>
-          <p className="text-xl text-gray-600">Мы создаем качественную одежду для активной жизни</p>
+          <p className="text-black dark:text-white">Мы создаем качественную одежду для активной жизни</p>
         </div>
 
         {/* Основной контент */}
@@ -15,7 +15,7 @@ export default function AboutPage() {
           {/* История компании */}
           <section className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-semibold mb-6 text-gray-800">Наша история</h2>
-            <div className="prose prose-lg max-w-none text-gray-600">
+            <div className="prose prose-lg max-w-none text-black dark:text-white">
               <p className="mb-4">
                 Наша компания была основана в 2020 году с целью создания качественной и доступной одежды для активного образа жизни. Мы верим, что каждый человек заслуживает иметь возможность выглядеть стильно и чувствовать себя комфортно в любой ситуации.
               </p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Качество</h3>
-                <p className="text-gray-800">Мы используем только лучшие материалы и тщательно контролируем каждый этап производства</p>
+                <p className="text-black dark:text-white">Мы используем только лучшие материалы и тщательно контролируем каждый этап производства</p>
               </div>
               <div className="text-center">
                 <div className="bg-blue-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -45,7 +45,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Надежность</h3>
-                <p className="text-gray-800">Мы ценим время наших клиентов и всегда выполняем свои обязательства</p>
+                <p className="text-black dark:text-white">Мы ценим время наших клиентов и всегда выполняем свои обязательства</p>
               </div>
               <div className="text-center">
                 <div className="bg-blue-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -54,7 +54,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">Забота</h3>
-                <p className="text-gray-800">Мы заботимся о комфорте наших клиентов и окружающей среде</p>
+                <p className="text-black dark:text-white">Мы заботимся о комфорте наших клиентов и окружающей среде</p>
               </div>
             </div>
           </section>
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <h3 className="text-lg font-medium text-gray-800 mb-4">Наши контакты</h3>
-                <ul className="space-y-3 text-gray-600">
+                <ul className="space-y-3 text-black dark:text-white">
                   <li className="flex items-center">
                     <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -89,7 +89,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-800 mb-4">Режим работы</h3>
-                <ul className="space-y-2 text-gray-600">
+                <ul className="space-y-2 text-black dark:text-white">
                   <li>Понедельник - Пятница: 9:00 - 18:00</li>
                   <li>Суббота: 10:00 - 16:00</li>
                   <li>Воскресенье: выходной</li>
