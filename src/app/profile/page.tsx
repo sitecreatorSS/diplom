@@ -245,7 +245,7 @@ export default function ProfilePage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-black dark:text-white mb-1">
                     Почему вы хотите стать продавцом?
                   </label>
                   <textarea

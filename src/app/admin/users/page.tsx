@@ -198,10 +198,10 @@ export default function UsersPage() {
                      'Покупатель'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black dark:text-white">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-black dark:text-white">
                   {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Никогда'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -270,7 +270,7 @@ export default function AdminSellerApplicationsPage() {
                             </div>
                           )}
                           {app.reviewNotes && (
-                            <div className="mt-1 p-2 bg-gray-50 rounded-md text-xs text-gray-600 max-w-xs text-right">
+                            <div className="mt-1 p-2 bg-gray-50 rounded-md text-xs text-black dark:text-white max-w-xs text-right">
                               <span className="font-medium">Комментарий: </span>
                               {app.reviewNotes}
                             </div>
