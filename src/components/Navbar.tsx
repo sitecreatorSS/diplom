@@ -86,7 +86,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button onClick={toggleCart} className="p-2 rounded-full hover:bg-gray-100">
-              <ShoppingCart className="h-5 w-5 text-black dark:text-white" />
+              <ShoppingCart className="h-5 w-5 text-gray-800" />
             </button>
 
             {session ? (
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-gray-800 font-medium">
                         {session.user.name ? session.user.name.charAt(0).toUpperCase() :
                          session.user.email ? session.user.email.charAt(0).toUpperCase() : 'U'}
                       </div>
