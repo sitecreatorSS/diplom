@@ -68,7 +68,7 @@ export default function AdminDashboard() {
 
       {/* Статистика */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
+        <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold">{stats?.totalUsers || 0}</CardTitle>
             <CardDescription>Всего пользователей</CardDescription>
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold">{stats?.totalProducts || 0}</CardTitle>
             <CardDescription>Товаров в каталоге</CardDescription>
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold">{stats?.pendingApplications || 0}</CardTitle>
             <CardDescription>Заявок на продавца</CardDescription>
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
+        <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100 bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold text-indigo-700">Быстрые действия</CardTitle>
           </CardHeader>
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
       {/* Разделы админки */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Users className="h-5 w-5 mr-2 text-indigo-600" />
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle className="flex items-center">
               <FileText className="h-5 w-5 mr-2 text-amber-600" />
