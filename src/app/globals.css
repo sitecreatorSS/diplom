@@ -19,3 +19,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+button[disabled], .btn[disabled], .button[disabled] {
+  opacity: 1 !important;
+  color: #111 !important;
+  background: #e5e7eb !important; /* bg-gray-200 */
+  pointer-events: auto !important;
+  filter: none !important;
+}
