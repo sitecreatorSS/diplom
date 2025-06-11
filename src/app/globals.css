@@ -22,8 +22,13 @@ body {
 
 button[disabled], .btn[disabled], .button[disabled] {
   opacity: 1 !important;
-  color: #111 !important;
-  background: #e5e7eb !important; /* bg-gray-200 */
+  color: #000 !important; /* black */
+  background-color: limegreen !important; /* TEST COLOR */
+  background-image: none !important;
+  border: 2px solid blue !important;
   pointer-events: auto !important;
   filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  isolation: isolate !important;
 }
