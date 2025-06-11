@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function Navigation() {
   return (
@@ -16,11 +17,10 @@ export default function Navigation() {
             <Link href="/auth/login" className="text-gray-600 hover:text-gray-900">
               Войти
             </Link>
-            <Link
-              href="/auth/register"
-              className="bg-blue-600 !important text-white !important px-4 py-2 rounded hover:bg-blue-700 font-medium whitespace-nowrap"
-            >
-              Регистрация
+            <Link href="/auth/register" passHref>
+              <Button variant="default">
+                Регистрация
+              </Button>
             </Link>
           </div>
         </div>

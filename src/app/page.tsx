@@ -23,25 +23,18 @@ export default function HomePage() {
           >
             Добро пожаловать в Магазин одежды
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <p
             className="text-xl mb-8 max-w-2xl mx-auto"
           >
             Откройте для себя последние коллекции и найдите свой уникальный стиль.
-          </motion.p>
-          <motion.div
-             initial={{ opacity: 0, scale: 0.9 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 0.5, delay: 0.4 }}
-          >
+          </p>
+          <div>
             <Link href="/catalog" passHref>
-              <Button size="lg" className="bg-white text-indigo-600 hover:bg-gray-200 text-lg opacity-100 !important">
+              <Button variant="default" size="lg" className="bg-red-500 !important text-yellow-300 !important opacity-100 !important filter-none !important mix-blend-mode-normal !important">
                 Перейти в каталог
               </Button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
