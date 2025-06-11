@@ -37,7 +37,7 @@ export default function HomePage() {
              transition={{ duration: 0.5, delay: 0.4 }}
           >
             <Link href="/catalog" passHref>
-              <Button size="lg" className="bg-white text-indigo-600 hover:bg-gray-200 text-lg">
+              <Button size="lg" className="bg-white text-indigo-600 hover:bg-gray-200 text-lg opacity-100 !important">
                 Перейти в каталог
               </Button>
             </Link>
