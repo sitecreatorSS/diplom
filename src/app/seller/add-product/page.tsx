@@ -3,9 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+
+interface Session {
+  user: {
+    id: string;
+    role: 'ADMIN' | 'SELLER' | 'BUYER';
+  };
+}
 
 export default function AddProductPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as { data: Session | null; status: string; };
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -23,12 +31,12 @@ export default function AddProductPage() {
   // Redirect if not authenticated or not a seller
   useEffect(() => {
     if (status === 'loading') return; // Wait for session loading
-    if (!session || session.user.role !== 'SELLER') {
+    if (!session || !session.user || session.user.role !== 'SELLER') {
       router.push('/'); // Redirect to home or login page
     }
   }, [session, status, router]);
 
-  if (status === 'loading' || !session || session.user.role !== 'SELLER') {
+  if (status === 'loading' || !session || !session.user || session.user.role !== 'SELLER') {
     return null; // Render nothing while redirecting or loading
   }
 
@@ -144,13 +152,14 @@ export default function AddProductPage() {
           </div>
         </div>
         
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-gray-200 text-black px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:bg-gray-200 disabled:text-black disabled:opacity-100`}
+          variant="default"
+          className="w-full font-semibold"
         >
           {isSubmitting ? 'Добавление...' : 'Добавить товар'}
-        </button>
+        </Button>
       </form>
     </div>
   );

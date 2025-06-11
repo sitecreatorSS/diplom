@@ -5,6 +5,7 @@ import { User, Edit, Trash2, Search } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Session } from 'next-auth';
+import { Button } from '@/components/ui/button';
 
 interface UserData {
   id: string;
@@ -205,18 +206,20 @@ export default function UsersPage() {
                   {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Никогда'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => handleEdit(user)}
                     className="text-blue-600 hover:text-blue-900 mr-4"
                   >
                     <Edit className="h-5 w-5" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => handleDelete(user.id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="h-5 w-5" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -261,7 +264,7 @@ export default function UsersPage() {
                 </label>
                 <select
                   value={selectedUser.role}
-                  onChange={(e) => setSelectedUser({...selectedUser, role: e.target.value as 'ADMIN' | 'SELLER' | 'BUYER'})}
+                  onChange={(e) => setSelectedUser({...selectedUser, role: e.target.value as UserData['role']})}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="BUYER">Покупатель</option>
@@ -269,23 +272,13 @@ export default function UsersPage() {
                   <option value="ADMIN">Администратор</option>
                 </select>
               </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setSelectedUser(null);
-                  }}
-                  className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
-                >
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
                   Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
+                </Button>
+                <Button type="submit" variant="default">
                   Сохранить
-                </button>
+                </Button>
               </div>
             </form>
           </div>

@@ -30,7 +30,7 @@ export default function HomePage() {
           </p>
           <div>
             <Link href="/catalog" passHref>
-              <Button variant="default" size="lg" className="bg-red-500 !important text-yellow-300 !important opacity-100 !important filter-none !important mix-blend-mode-normal !important">
+              <Button variant="default" size="lg">
                 Перейти в каталог
               </Button>
             </Link>

@@ -281,11 +281,10 @@ export default function AdminSellerApplicationsPage() {
                       {app.status === 'PENDING' && (
                         <div className="mt-4 flex justify-end space-x-2">
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
                             onClick={() => handleUpdateStatus(app.id, 'REJECTED')}
                             disabled={updating[app.id]}
-                            className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
                           >
                             {updating[app.id] ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -296,9 +295,9 @@ export default function AdminSellerApplicationsPage() {
                           </Button>
                           <Button
                             size="sm"
+                            variant="default"
                             onClick={() => handleUpdateStatus(app.id, 'APPROVED')}
                             disabled={updating[app.id]}
-                            className="bg-green-600 hover:bg-green-700"
                           >
                             {updating[app.id] ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

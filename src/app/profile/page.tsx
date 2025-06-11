@@ -261,7 +261,7 @@ export default function ProfilePage() {
                 <Button
                   onClick={handleApplyAsSeller}
                   disabled={applying}
-                  className="bg-indigo-600 hover:bg-indigo-700"
+                  variant="default"
                 >
                   {applying ? (
                     <>

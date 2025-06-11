@@ -3,6 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+
+interface Session {
+  user: {
+    id: string;
+    role: 'ADMIN' | 'SELLER' | 'BUYER';
+  };
+}
 
 interface ProductData {
   id: string;
@@ -30,7 +38,7 @@ interface ProductFormData {
 }
 
 export default function EditProductPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as { data: Session | null; status: string; };
   const router = useRouter();
   const params = useParams();
   const productId = params.productId as string;
@@ -55,14 +63,14 @@ export default function EditProductPage() {
   // Redirect if not authenticated or not a seller
   useEffect(() => {
     if (status === 'loading') return; // Wait for session loading
-    if (!session || session.user.role !== 'SELLER') {
+    if (!session || !session.user || session.user.role !== 'SELLER') {
       router.push('/'); // Redirect to home or login page
     }
   }, [session, status, router]);
 
   // Fetch product data
   useEffect(() => {
-    if (!productId || !session || session.user.role !== 'SELLER') return; // Only fetch if we have product ID and seller session
+    if (!productId || !session || !session.user || session.user.role !== 'SELLER') return; // Only fetch if we have product ID and seller session
 
     const fetchProduct = async () => {
       try {
@@ -100,7 +108,7 @@ export default function EditProductPage() {
   }, [productId, session]); // Depend on productId and session
 
   // Show loading, error states, or redirecting state
-  if (status === 'loading' || isLoading || !session || session.user.role !== 'SELLER') {
+  if (status === 'loading' || isLoading || !session || !session.user || session.user.role !== 'SELLER') {
     return (
        <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
@@ -256,13 +264,15 @@ export default function EditProductPage() {
           </div>
         </div>
         
-        <button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          variant="default"
+          size="default"
+          className="w-full font-semibold"
         >
           {isSubmitting ? 'Сохранение...' : 'Сохранить изменения'}
-        </button>
+        </Button>
       </form>
     </div>
   );
