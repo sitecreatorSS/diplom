@@ -70,11 +70,11 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card className="bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-3xl font-bold">{stats?.totalUsers || 0}</CardTitle>
-            <CardDescription>Всего пользователей</CardDescription>
+            <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</CardTitle>
+            <CardDescription className="text-gray-700">Всего пользователей</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center text-sm text-gray-800">
               <Users className="h-4 w-4 mr-2" />
               <span>{stats?.totalBuyers || 0} покупателей, {stats?.totalSellers || 0} продавцов</span>
             </div>
@@ -83,11 +83,11 @@ export default function AdminDashboard() {
 
         <Card className="bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-3xl font-bold">{stats?.totalProducts || 0}</CardTitle>
-            <CardDescription>Товаров в каталоге</CardDescription>
+            <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalProducts || 0}</CardTitle>
+            <CardDescription className="text-gray-700">Товаров в каталоге</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center text-sm text-gray-800">
               <Package className="h-4 w-4 mr-2" />
               <span>Доступно для заказа</span>
             </div>
@@ -96,11 +96,11 @@ export default function AdminDashboard() {
 
         <Card className="bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-3xl font-bold">{stats?.pendingApplications || 0}</CardTitle>
-            <CardDescription>Заявок на продавца</CardDescription>
+            <CardTitle className="text-3xl font-bold text-gray-900">{stats?.pendingApplications || 0}</CardTitle>
+            <CardDescription className="text-gray-700">Заявок на продавца</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center text-sm text-gray-800">
               <FileText className="h-4 w-4 mr-2" />
               <span>Требуют рассмотрения</span>
             </div>
@@ -114,19 +114,19 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="space-y-2">
               <Link href="/admin/seller-applications">
-                <Button variant="outline" className="w-full justify-between">
+                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
                   <span>Заявки продавцов</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/admin/users">
-                <Button variant="outline" className="w-full justify-between">
+                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
                   <span>Управление пользователями</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/admin/products">
-                <Button variant="outline" className="w-full justify-between">
+                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
                   <span>Управление товарами</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -140,28 +140,28 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-gray-900">
               <Users className="h-5 w-5 mr-2 text-indigo-600" />
               Пользователи
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-700">
               Управление пользователями и их ролями
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Всего зарегистрировано: <span className="font-medium">{stats?.totalUsers || 0}</span>
+              <p className="text-sm text-gray-800">
+                Всего зарегистрировано: <span className="font-medium text-gray-900">{stats?.totalUsers || 0}</span>
               </p>
-              <p className="text-sm text-gray-600">
-                Продавцов: <span className="font-medium">{stats?.totalSellers || 0}</span>
+              <p className="text-sm text-gray-800">
+                Продавцов: <span className="font-medium text-gray-900">{stats?.totalSellers || 0}</span>
               </p>
-              <p className="text-sm text-gray-600">
-                Покупателей: <span className="font-medium">{stats?.totalBuyers || 0}</span>
+              <p className="text-sm text-gray-800">
+                Покупателей: <span className="font-medium text-gray-900">{stats?.totalBuyers || 0}</span>
               </p>
               <div className="pt-2">
                 <Link href="/admin/users">
-                  <Button variant="outline" size="sm" className="mt-2">
+                  <Button variant="outline" size="sm" className="mt-2 bg-black text-white hover:bg-gray-800">
                     Управление пользователями
                   </Button>
                 </Link>
@@ -172,27 +172,27 @@ export default function AdminDashboard() {
 
         <Card className="bg-white">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-gray-900">
               <FileText className="h-5 w-5 mr-2 text-amber-600" />
               Заявки на продавца
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-700">
               Рассмотрение заявок на получение статуса продавца
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Ожидают рассмотрения: <span className="font-medium">{stats?.pendingApplications || 0}</span>
+              <p className="text-sm text-gray-800">
+                Ожидают рассмотрения: <span className="font-medium text-gray-900">{stats?.pendingApplications || 0}</span>
               </p>
-              <p className="text-sm text-amber-600">
+              <p className="text-sm text-amber-700">
                 {stats?.pendingApplications === 0
                   ? 'Нет новых заявок на рассмотрение'
                   : 'Есть заявки, требующие вашего внимания'}
               </p>
               <div className="pt-2">
                 <Link href="/admin/seller-applications">
-                  <Button variant="outline" size="sm" className="mt-2">
+                  <Button variant="outline" size="sm" className="mt-2 bg-black text-white hover:bg-gray-800">
                     {stats?.pendingApplications === 0 ? 'Просмотреть все' : 'Проверить заявки'}
                   </Button>
                 </Link>
