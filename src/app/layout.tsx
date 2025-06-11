@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { Providers } from "@/app/providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Session } from 'next-auth';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,14 +24,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
+  const session = (await getServerSession(authOptions)) as Session | null;
 
   return (
     <html lang="ru" className={inter.variable}>
-      <body className="font-sans antialiased min-h-screen flex flex-col">
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-white">
         <Providers session={session}>
           <Navbar />
-          <main className="flex-grow">
+          <main className="flex-grow bg-white">
             {children}
           </main>
           <Footer />
