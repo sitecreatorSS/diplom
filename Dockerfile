@@ -40,7 +40,7 @@ RUN npm ci --only=production
 # Копируем собранное приложение из предыдущего этапа
 COPY --from=base /app/.next ./.next
 COPY --from=base /app/public ./public
-COPY --from=base /app/next.config.ts ./
+COPY --from=base /app/next.config.mjs ./
 
 # Открываем порт, который будет использовать приложение
 EXPOSE 3000
