@@ -54,7 +54,7 @@ export default function HomePage() {
             Наша миссия - помочь вам выразить себя через моду, предлагая только лучшие товары от проверенных продавцов.
           </p>
           <Link href="/about" passHref>
-             <Button variant="outline" size="lg">
+             <Button variant="default" size="lg">
                Подробнее о нас
              </Button>
           </Link>
