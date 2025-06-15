@@ -93,11 +93,12 @@ export default function Navbar() {
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-12 w-12 rounded-full">
-                      <div className="h-12 w-12 rounded-full bg-indigo-600 flex items-center justify-center text-gray-800 font-medium">
-                        {session.user.name ? session.user.name.charAt(0).toUpperCase() :
-                         session.user.email ? session.user.email.charAt(0).toUpperCase() : 'U'}
-                      </div>
+                    <Button 
+                      variant="ghost" 
+                      className="relative h-12 w-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium cursor-pointer p-0 !important leading-none"
+                    >
+                      {session.user.name ? session.user.name.charAt(0).toUpperCase() :
+                       session.user.email ? session.user.email.charAt(0).toUpperCase() : 'U'}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 bg-white !important shadow-lg" align="end" forceMount>
