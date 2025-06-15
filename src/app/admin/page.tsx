@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Панель администратора</h1>
-          <p className="text-gray-600">Обзор системы и управление</p>
+          <p className="text-gray-800">Обзор системы и управление</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</CardTitle>
-            <CardDescription className="text-gray-700">Всего пользователей</CardDescription>
+            <CardDescription className="text-gray-800">Всего пользователей</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-sm text-gray-800">
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalProducts || 0}</CardTitle>
-            <CardDescription className="text-gray-700">Товаров в каталоге</CardDescription>
+            <CardDescription className="text-gray-800">Товаров в каталоге</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-sm text-gray-800">
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.pendingApplications || 0}</CardTitle>
-            <CardDescription className="text-gray-700">Заявок на продавца</CardDescription>
+            <CardDescription className="text-gray-800">Заявок на продавца</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-sm text-gray-800">
@@ -114,19 +114,19 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="space-y-2">
               <Link href="/admin/seller-applications">
-                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
+                <Button variant="default" className="w-full justify-between">
                   <span>Заявки продавцов</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/admin/users">
-                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
+                <Button variant="default" className="w-full justify-between">
                   <span>Управление пользователями</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/admin/products">
-                <Button variant="outline" className="w-full justify-between bg-black text-white hover:bg-gray-800">
+                <Button variant="default" className="w-full justify-between">
                   <span>Управление товарами</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
               <Users className="h-5 w-5 mr-2 text-indigo-600" />
               Пользователи
             </CardTitle>
-            <CardDescription className="text-gray-700">
+            <CardDescription className="text-gray-800">
               Управление пользователями и их ролями
             </CardDescription>
           </CardHeader>
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
               </p>
               <div className="pt-2">
                 <Link href="/admin/users">
-                  <Button variant="outline" size="sm" className="mt-2 bg-black text-white hover:bg-gray-800">
+                  <Button variant="default" size="sm" className="mt-2">
                     Управление пользователями
                   </Button>
                 </Link>
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
               <FileText className="h-5 w-5 mr-2 text-amber-600" />
               Заявки на продавца
             </CardTitle>
-            <CardDescription className="text-gray-700">
+            <CardDescription className="text-gray-800">
               Рассмотрение заявок на получение статуса продавца
             </CardDescription>
           </CardHeader>
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
               </p>
               <div className="pt-2">
                 <Link href="/admin/seller-applications">
-                  <Button variant="outline" size="sm" className="mt-2 bg-black text-white hover:bg-gray-800">
+                  <Button variant="default" size="sm" className="mt-2">
                     {stats?.pendingApplications === 0 ? 'Просмотреть все' : 'Проверить заявки'}
                   </Button>
                 </Link>
