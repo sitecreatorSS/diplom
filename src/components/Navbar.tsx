@@ -107,7 +107,7 @@ export default function Navbar() {
                         <p className="text-sm font-medium leading-none">
                           {session.user.name || 'Пользователь'}
                         </p>
-                        <p className="text-xs leading-none text-black dark:text-white">
+                        <p className="text-xs leading-none text-gray-900">
                           {session.user.email}
                         </p>
                       </div>

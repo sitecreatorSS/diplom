@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Панель администратора</h1>
-          <p className="text-gray-800">Обзор системы и управление</p>
+          <p className="text-gray-900">Обзор системы и управление</p>
         </div>
       </div>
 
@@ -71,10 +71,10 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</CardTitle>
-            <CardDescription className="text-gray-800">Всего пользователей</CardDescription>
+            <CardDescription className="text-gray-900">Всего пользователей</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-800">
+            <div className="flex items-center text-sm text-gray-900">
               <Users className="h-4 w-4 mr-2" />
               <span>{stats?.totalBuyers || 0} покупателей, {stats?.totalSellers || 0} продавцов</span>
             </div>
@@ -84,10 +84,10 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.totalProducts || 0}</CardTitle>
-            <CardDescription className="text-gray-800">Товаров в каталоге</CardDescription>
+            <CardDescription className="text-gray-900">Товаров в каталоге</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-800">
+            <div className="flex items-center text-sm text-gray-900">
               <Package className="h-4 w-4 mr-2" />
               <span>Доступно для заказа</span>
             </div>
@@ -97,10 +97,10 @@ export default function AdminDashboard() {
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-3xl font-bold text-gray-900">{stats?.pendingApplications || 0}</CardTitle>
-            <CardDescription className="text-gray-800">Заявок на продавца</CardDescription>
+            <CardDescription className="text-gray-900">Заявок на продавца</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center text-sm text-gray-800">
+            <div className="flex items-center text-sm text-gray-900">
               <FileText className="h-4 w-4 mr-2" />
               <span>Требуют рассмотрения</span>
             </div>
@@ -144,19 +144,19 @@ export default function AdminDashboard() {
               <Users className="h-5 w-5 mr-2 text-indigo-600" />
               Пользователи
             </CardTitle>
-            <CardDescription className="text-gray-800">
+            <CardDescription className="text-gray-900">
               Управление пользователями и их ролями
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm text-gray-800">
+              <p className="text-sm text-gray-900">
                 Всего зарегистрировано: <span className="font-medium text-gray-900">{stats?.totalUsers || 0}</span>
               </p>
-              <p className="text-sm text-gray-800">
+              <p className="text-sm text-gray-900">
                 Продавцов: <span className="font-medium text-gray-900">{stats?.totalSellers || 0}</span>
               </p>
-              <p className="text-sm text-gray-800">
+              <p className="text-sm text-gray-900">
                 Покупателей: <span className="font-medium text-gray-900">{stats?.totalBuyers || 0}</span>
               </p>
               <div className="pt-2">
@@ -176,13 +176,13 @@ export default function AdminDashboard() {
               <FileText className="h-5 w-5 mr-2 text-amber-600" />
               Заявки на продавца
             </CardTitle>
-            <CardDescription className="text-gray-800">
+            <CardDescription className="text-gray-900">
               Рассмотрение заявок на получение статуса продавца
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm text-gray-800">
+              <p className="text-sm text-gray-900">
                 Ожидают рассмотрения: <span className="font-medium text-gray-900">{stats?.pendingApplications || 0}</span>
               </p>
               <p className="text-sm text-amber-700">
