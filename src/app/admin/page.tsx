@@ -72,10 +72,10 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.totalUsers || 0}</CardTitle>
-              <CardDescription className="text-gray-700">Всего пользователей</CardDescription>
+              <CardDescription className="text-indigo-600">Всего пользователей</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center text-sm text-gray-800">
+              <div className="flex items-center text-sm text-gray-900">
                 <Users className="h-4 w-4 mr-2 text-indigo-600" />
                 <span>{stats?.totalBuyers || 0} покупателей, {stats?.totalSellers || 0} продавцов</span>
               </div>
@@ -85,10 +85,10 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.totalProducts || 0}</CardTitle>
-              <CardDescription className="text-gray-700">Товаров в каталоге</CardDescription>
+              <CardDescription className="text-indigo-600">Товаров в каталоге</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center text-sm text-gray-800">
+              <div className="flex items-center text-sm text-gray-900">
                 <Package className="h-4 w-4 mr-2 text-indigo-600" />
                 <span>Доступно для заказа</span>
               </div>
@@ -98,10 +98,10 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.pendingApplications || 0}</CardTitle>
-              <CardDescription className="text-gray-700">Заявок на продавца</CardDescription>
+              <CardDescription className="text-indigo-600">Заявок на продавца</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center text-sm text-gray-800">
+              <div className="flex items-center text-sm text-gray-900">
                 <FileText className="h-4 w-4 mr-2 text-indigo-600" />
                 <span>Требуют рассмотрения</span>
               </div>
@@ -145,19 +145,19 @@ export default function AdminDashboard() {
                 <Users className="h-5 w-5 mr-2 text-indigo-600" />
                 Пользователи
               </CardTitle>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-indigo-600">
                 Управление пользователями и их ролями
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-gray-900">
                   Всего зарегистрировано: <span className="font-medium text-indigo-700">{stats?.totalUsers || 0}</span>
                 </p>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-gray-900">
                   Продавцов: <span className="font-medium text-indigo-700">{stats?.totalSellers || 0}</span>
                 </p>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-gray-900">
                   Покупателей: <span className="font-medium text-indigo-700">{stats?.totalBuyers || 0}</span>
                 </p>
                 <div className="pt-2">
@@ -177,16 +177,16 @@ export default function AdminDashboard() {
                 <FileText className="h-5 w-5 mr-2 text-indigo-600" />
                 Заявки на продавца
               </CardTitle>
-              <CardDescription className="text-gray-700">
+              <CardDescription className="text-indigo-600">
                 Рассмотрение заявок на получение статуса продавца
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-gray-900">
                   Ожидают рассмотрения: <span className="font-medium text-indigo-700">{stats?.pendingApplications || 0}</span>
                 </p>
-                <p className={`text-sm ${stats?.pendingApplications === 0 ? 'text-gray-800' : 'text-indigo-700'}`}>
+                <p className={`text-sm ${stats?.pendingApplications === 0 ? 'text-gray-900' : 'text-indigo-700'}`}>
                   {stats?.pendingApplications === 0
                     ? 'Нет новых заявок на рассмотрение'
                     : 'Есть заявки, требующие вашего внимания'}
