@@ -147,11 +147,11 @@ export default function AdminSellerApplicationsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Панель администратора</h1>
-            <p className="text-gray-600">Управление заявками продавцов</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Панель администратора</h1>
+            <p className="text-indigo-700">Управление заявками продавцов</p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => router.push('/admin')}>
+            <Button variant="default" onClick={() => router.push('/admin')}>
               Назад в админку
             </Button>
           </div>
@@ -167,33 +167,33 @@ export default function AdminSellerApplicationsPage() {
         {/* Статистика */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card>
+            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
               <CardHeader className="pb-2">
-                <CardTitle className="text-3xl font-bold">{stats.totalUsers}</CardTitle>
-                <CardDescription>Всего пользователей</CardDescription>
+                <CardTitle className="text-3xl font-bold text-indigo-700">{stats.totalUsers}</CardTitle>
+                <CardDescription className="text-indigo-700 !opacity-100">Всего пользователей</CardDescription>
               </CardHeader>
             </Card>
-            <Card>
+            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
               <CardHeader className="pb-2">
-                <CardTitle className="text-3xl font-bold">{stats.totalSellers}</CardTitle>
-                <CardDescription>Продавцов</CardDescription>
+                <CardTitle className="text-3xl font-bold text-indigo-700">{stats.totalSellers}</CardTitle>
+                <CardDescription className="text-indigo-700 !opacity-100">Продавцов</CardDescription>
               </CardHeader>
             </Card>
-            <Card>
+            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
               <CardHeader className="pb-2">
-                <CardTitle className="text-3xl font-bold">{stats.totalBuyers}</CardTitle>
-                <CardDescription>Покупателей</CardDescription>
+                <CardTitle className="text-3xl font-bold text-indigo-700">{stats.totalBuyers}</CardTitle>
+                <CardDescription className="text-indigo-700 !opacity-100">Покупателей</CardDescription>
               </CardHeader>
             </Card>
           </div>
         )}
 
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Заявки на продавца</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-indigo-700">Заявки на продавца</CardTitle>
+                <CardDescription className="text-indigo-700 !opacity-100">
                   {applications.length} заявок, {applications.filter(a => a.status === 'PENDING').length} на рассмотрении
                 </CardDescription>
               </div>
@@ -210,39 +210,39 @@ export default function AdminSellerApplicationsPage() {
           </CardHeader>
           <CardContent>
             {filteredApplications.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-indigo-700">
                 {searchTerm ? 'Заявки не найдены' : 'Нет заявок на рассмотрении'}
               </div>
             ) : (
               <div className="space-y-4">
                 {filteredApplications.map((app) => (
-                  <Card key={app.id} className="overflow-hidden">
+                  <Card key={app.id} className="overflow-hidden bg-white border border-indigo-100">
                     <div className="p-4">
                       <div className="flex justify-between items-start">
                         <div>
                           <div className="flex items-center space-x-2">
-                            <User className="h-4 w-4 text-gray-500" />
-                            <span className="font-medium">
+                            <User className="h-4 w-4 text-indigo-600" />
+                            <span className="font-medium text-gray-900">
                               {app.user.name || 'Без имени'}
                             </span>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-indigo-700">
                               ({app.user.role === 'ADMIN' ? 'Админ' : app.user.role === 'SELLER' ? 'Продавец' : 'Покупатель'})
                             </span>
                           </div>
                           <div className="flex items-center space-x-2 mt-1">
-                            <Mail className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">{app.user.email}</span>
+                            <Mail className="h-4 w-4 text-indigo-600" />
+                            <span className="text-sm text-indigo-700">{app.user.email}</span>
                           </div>
                           <div className="flex items-center space-x-2 mt-1">
-                            <Calendar className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 text-indigo-600" />
+                            <span className="text-sm text-indigo-700">
                               Зарегистрирован {getDaysSinceRegistered(app.user.createdAt)} дней назад
                             </span>
                           </div>
                           {app.message && (
-                            <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                              <p className="text-sm font-medium text-gray-700">Сообщение от пользователя:</p>
-                              <p className="text-sm text-gray-600 mt-1">{app.message}</p>
+                            <div className="mt-3 p-3 bg-indigo-50 rounded-md">
+                              <p className="text-sm font-medium text-indigo-700">Сообщение от пользователя:</p>
+                              <p className="text-sm text-gray-900 mt-1">{app.message}</p>
                             </div>
                           )}
                         </div>
@@ -255,11 +255,11 @@ export default function AdminSellerApplicationsPage() {
                             {app.status === 'PENDING' ? 'На рассмотрении' :
                              app.status === 'APPROVED' ? 'Одобрено' : 'Отклонено'}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-indigo-700">
                             {formatDate(app.createdAt)}
                           </div>
                           {app.reviewedAt && app.reviewer && (
-                            <div className="text-xs text-gray-500 text-right">
+                            <div className="text-xs text-indigo-700 text-right">
                               {app.status === 'APPROVED' ? 'Одобрено' : 'Отклонено'} {formatDate(app.reviewedAt)}
                               <br />
                               {app.reviewer.name ? (
@@ -270,7 +270,7 @@ export default function AdminSellerApplicationsPage() {
                             </div>
                           )}
                           {app.reviewNotes && (
-                            <div className="mt-1 p-2 bg-gray-50 rounded-md text-xs text-black dark:text-white max-w-xs text-right">
+                            <div className="mt-1 p-2 bg-indigo-50 rounded-md text-xs text-indigo-700 max-w-xs text-right">
                               <span className="font-medium">Комментарий: </span>
                               {app.reviewNotes}
                             </div>
