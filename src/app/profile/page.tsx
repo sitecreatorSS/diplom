@@ -140,67 +140,67 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Мой профиль</h1>
+        <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Мой профиль</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
+          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle>Основная информация</CardTitle>
+              <CardTitle className="text-indigo-700">Основная информация</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-500">Имя</p>
-                <p className="font-medium">{profile.name || 'Не указано'}</p>
+                <p className="text-sm text-gray-600">Имя</p>
+                <p className="font-medium text-gray-900">{profile.name || 'Не указано'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{profile.email}</p>
+                <p className="text-sm text-gray-600">Email</p>
+                <p className="font-medium text-gray-900">{profile.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Роль</p>
-                <p className="font-medium capitalize">
+                <p className="text-sm text-gray-600">Роль</p>
+                <p className="font-medium text-gray-900 capitalize">
                   {profile.role === 'ADMIN' ? 'Администратор' : 
                    profile.role === 'SELLER' ? 'Продавец' : 'Покупатель'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Дата регистрации</p>
-                <p className="font-medium">
+                <p className="text-sm text-gray-600">Дата регистрации</p>
+                <p className="font-medium text-gray-900">
                   {formatDate(profile.createdAt)} ({getDaysSinceRegistered(profile.createdAt)} дней назад)
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle>Статистика</CardTitle>
+              <CardTitle className="text-indigo-700">Статистика</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-500">Всего заказов</p>
-                <p className="text-2xl font-bold">{profile._count.orders}</p>
+                <p className="text-sm text-gray-600">Всего заказов</p>
+                <p className="text-2xl font-bold text-indigo-700">{profile._count.orders}</p>
               </div>
               
               {profile.role === 'SELLER' && (
                 <div>
-                  <p className="text-sm text-gray-500">Товаров в продаже</p>
-                  <p className="text-2xl font-bold">{profile._count.products}</p>
+                  <p className="text-sm text-gray-600">Товаров в продаже</p>
+                  <p className="text-2xl font-bold text-indigo-700">{profile._count.products}</p>
                 </div>
               )}
               
               <div className="pt-4">
-                <p className="text-sm text-gray-500">Статус аккаунта</p>
+                <p className="text-sm text-gray-600">Статус аккаунта</p>
                 {profile.role === 'SELLER' ? (
-                  <div className="mt-2 p-3 bg-green-50 text-green-700 rounded-md">
+                  <div className="mt-2 p-3 bg-green-50 text-green-700 rounded-md border border-green-100">
                     <p className="font-medium">Вы продавец</p>
                     <p className="text-sm mt-1">Теперь вы можете добавлять и продавать товары</p>
                   </div>
                 ) : profile.sellerApplication ? (
                   <div className={`mt-2 p-3 ${
                     profile.sellerApplication.status === 'PENDING' 
-                      ? 'bg-yellow-50 text-yellow-700' 
-                      : 'bg-red-50 text-red-700'
+                      ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' 
+                      : 'bg-red-50 text-red-700 border border-red-100'
                   } rounded-md`}>
                     <p className="font-medium">
                       {profile.sellerApplication.status === 'PENDING' 
@@ -215,7 +215,7 @@ export default function ProfilePage() {
                     )}
                     {profile.sellerApplication.status === 'REJECTED' && (
                       <Button 
-                        variant="outline" 
+                        variant="default" 
                         className="mt-2"
                         onClick={() => {
                           setApplicationMessage(profile.sellerApplication?.message || '');
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                 ) : (
-                  <div className="mt-2 p-3 bg-blue-50 text-blue-700 rounded-md">
+                  <div className="mt-2 p-3 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-100">
                     <p className="font-medium">Вы покупатель</p>
                     <p className="text-sm mt-1">Хотите стать продавцом? Отправьте заявку ниже.</p>
                   </div>
@@ -238,14 +238,14 @@ export default function ProfilePage() {
         </div>
 
         {(profile.role === 'BUYER' && (!profile.sellerApplication || profile.sellerApplication.status === 'REJECTED')) && (
-          <Card id="seller-application" className="mt-6">
+          <Card id="seller-application" className="mt-6 bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle>Стать продавцом</CardTitle>
+              <CardTitle className="text-indigo-700">Стать продавцом</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-black dark:text-white mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
                     Почему вы хотите стать продавцом?
                   </label>
                   <textarea
