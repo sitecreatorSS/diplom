@@ -72,7 +72,7 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.totalUsers || 0}</CardTitle>
-              <CardDescription className="text-indigo-600">Всего пользователей</CardDescription>
+              <CardDescription className="text-indigo-700">Всего пользователей</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center text-sm text-gray-900">
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.totalProducts || 0}</CardTitle>
-              <CardDescription className="text-indigo-600">Товаров в каталоге</CardDescription>
+              <CardDescription className="text-indigo-700">Товаров в каталоге</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center text-sm text-gray-900">
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-3xl font-bold text-indigo-700">{stats?.pendingApplications || 0}</CardTitle>
-              <CardDescription className="text-indigo-600">Заявок на продавца</CardDescription>
+              <CardDescription className="text-indigo-700">Заявок на продавца</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center text-sm text-gray-900">
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
                 <Users className="h-5 w-5 mr-2 text-indigo-600" />
                 Пользователи
               </CardTitle>
-              <CardDescription className="text-indigo-600">
+              <CardDescription className="text-indigo-700">
                 Управление пользователями и их ролями
               </CardDescription>
             </CardHeader>
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
                 <FileText className="h-5 w-5 mr-2 text-indigo-600" />
                 Заявки на продавца
               </CardTitle>
-              <CardDescription className="text-indigo-600">
+              <CardDescription className="text-indigo-700">
                 Рассмотрение заявок на получение статуса продавца
               </CardDescription>
             </CardHeader>
