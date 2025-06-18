@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { query } from '@/lib/db';
 
 // Update the type to correctly reflect the included relations and parsed fields
 type ProductWithDetails = {
@@ -44,4 +45,16 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Add or update POST function for updating stock later
-// export async function POST(request: Request, { params }: { params: { id: string } }) { /* ... */ } 
+// export async function POST(request: Request, { params }: { params: { id: string } }) { /* ... */ }
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const productId = params.id;
+    // Удаляем товар из базы данных
+    await query('DELETE FROM "Product" WHERE id = $1', [productId]);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Product delete error:', error);
+    return NextResponse.json({ error: 'Ошибка при удалении товара' }, { status: 500 });
+  }
+} 
