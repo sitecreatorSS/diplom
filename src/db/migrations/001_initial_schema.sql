@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS "Tag" (
 );
 
 -- Таблица товаров
-CREATE TABLE IF NOT EXISTS "Product" (
+CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS "Product" (
 
 -- Таблица связи товаров и тегов (многие-ко-многим)
 CREATE TABLE IF NOT EXISTS "ProductTag" (
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   tag_id UUID NOT NULL REFERENCES "Tag"(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY (product_id, tag_id)
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS "ProductTag" (
 -- Таблица изображений товаров
 CREATE TABLE IF NOT EXISTS "ProductImage" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   url VARCHAR(512) NOT NULL,
   alt_text VARCHAR(255),
   is_primary BOOLEAN DEFAULT false,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS "ProductImage" (
 -- Таблица отзывов
 CREATE TABLE IF NOT EXISTS "Review" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   title VARCHAR(255),
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS "Order" (
 CREATE TABLE IF NOT EXISTS "OrderItem" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES "Order"(id) ON DELETE CASCADE,
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE RESTRICT,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
   product_name VARCHAR(255) NOT NULL,
   product_image VARCHAR(512),
   quantity INTEGER NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS "OrderItem" (
 CREATE TABLE IF NOT EXISTS "CartItem" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   quantity INTEGER NOT NULL DEFAULT 1,
   price_at_addition DECIMAL(10, 2) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS "CartItem" (
 CREATE TABLE IF NOT EXISTS "WishlistItem" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
-  product_id UUID NOT NULL REFERENCES "Product"(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, product_id)
@@ -235,8 +235,8 @@ CREATE TABLE IF NOT EXISTS "AuditLog" (
 );
 
 -- Индексы для ускорения поиска
-CREATE INDEX idx_product_category ON "Product"(category_id);
-CREATE INDEX idx_product_seller ON "Product"(seller_id);
+CREATE INDEX idx_product_category ON products(category_id);
+CREATE INDEX idx_product_seller ON products(seller_id);
 CREATE INDEX idx_order_user ON "Order"(user_id);
 CREATE INDEX idx_order_status ON "Order"(status);
 CREATE INDEX idx_review_product ON "Review"(product_id);
@@ -262,7 +262,7 @@ BEFORE UPDATE ON "User"
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_product_updated_at
-BEFORE UPDATE ON "Product"
+BEFORE UPDATE ON products
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_category_updated_at
@@ -305,7 +305,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE FUNCTION update_product_rating()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE "Product" SET
+  UPDATE products SET
     rating = (
       SELECT AVG(rating)::numeric(3,2)
       FROM "Review"

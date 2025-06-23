@@ -46,7 +46,7 @@ export async function findWishlistItems(
             p.stock as "productStock",
             p."sellerId" as "productSellerId"
      ${queryStr}
-     LEFT JOIN "Product" p ON wi."productId" = p.id`,
+     LEFT JOIN products p ON wi."productId" = p.id`,
     queryParams
   );
 

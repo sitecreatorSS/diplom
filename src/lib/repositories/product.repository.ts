@@ -12,23 +12,23 @@ interface FindProductsOptions {
 export async function findProducts(options: FindProductsOptions = {}): Promise<{ products: Product[]; total: number }> {
   const { category, search, sellerId, limit, offset } = options;
   
-  let queryStr = 'FROM "Product" WHERE 1=1';
+  let queryStr = 'FROM products WHERE 1=1';
   const queryParams: any[] = [];
   let paramIndex = 1;
 
   if (category) {
-    queryStr += ` AND "category" = $${paramIndex++}`;
+    queryStr += ` AND category = $${paramIndex++}`;
     queryParams.push(category);
   }
 
   if (search) {
-    queryStr += ` AND ("name" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`;
+    queryStr += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
     queryParams.push(`%${search}%`);
     paramIndex++;
   }
 
   if (sellerId) {
-    queryStr += ` AND "sellerId" = $${paramIndex++}`;
+    queryStr += ` AND seller_id = $${paramIndex++}`;
     queryParams.push(sellerId);
   }
 
@@ -37,7 +37,7 @@ export async function findProducts(options: FindProductsOptions = {}): Promise<{
   const total = parseInt(countResult.rows[0].count, 10);
 
   // Add ordering and pagination
-  queryStr += ' ORDER BY "createdAt" DESC';
+  queryStr += ' ORDER BY createdAt DESC';
   
   if (limit !== undefined) {
     queryStr += ` LIMIT $${paramIndex++}`;
@@ -59,7 +59,7 @@ export async function findProducts(options: FindProductsOptions = {}): Promise<{
 }
 
 export async function findProductById(id: string): Promise<Product | null> {
-  const result = await query('SELECT * FROM "Product" WHERE id = $1', [id]);
+  const result = await query('SELECT * FROM products WHERE id = $1', [id]);
   return result.rows[0] || null;
 }
 
@@ -92,9 +92,9 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
   } = productData;
   
   const result = await query(
-    `INSERT INTO "Product" (
+    `INSERT INTO products (
       name, description, price, category, stock, image, 
-      specifications, "sellerId"
+      specifications, seller_id
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
     RETURNING *`,
     [
@@ -137,7 +137,7 @@ export async function updateProduct(
   } = productData;
   
   const result = await query(
-    `UPDATE "Product" 
+    `UPDATE products 
      SET 
        name = COALESCE($1, name),
        description = COALESCE($2, description),
@@ -146,7 +146,7 @@ export async function updateProduct(
        stock = COALESCE($5, stock),
        image = ${image === undefined ? 'image' : '$6'},
        specifications = COALESCE($7, specifications),
-       "updatedAt" = NOW()
+       updated_at = NOW()
      WHERE id = ${image === undefined ? '$6' : '$8'}
      RETURNING *`,
     [
@@ -165,7 +165,7 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
-  const result = await query('DELETE FROM "Product" WHERE id = $1 RETURNING id', [id]);
+  const result = await query('DELETE FROM products WHERE id = $1 RETURNING id', [id]);
   return result.rowCount ? result.rowCount > 0 : false;
 }
 
@@ -174,8 +174,8 @@ export async function updateProductStock(
   quantityChange: number
 ): Promise<Product | null> {
   const result = await query(
-    `UPDATE "Product" 
-     SET stock = stock + $1, "updatedAt" = NOW()
+    `UPDATE products 
+     SET stock = stock + $1, updated_at = NOW()
      WHERE id = $2 AND stock + $1 >= 0
      RETURNING *`,
     [quantityChange, id]
@@ -192,6 +192,6 @@ export async function checkProductOwner(productId: string, userId: string, requi
     }
   }
   
-  const result = await query('SELECT 1 FROM "Product" WHERE id = $1 AND "sellerId" = $2', [productId, userId]);
+  const result = await query('SELECT 1 FROM products WHERE id = $1 AND seller_id = $2', [productId, userId]);
   return result.rowCount ? result.rowCount > 0 : false;
 }

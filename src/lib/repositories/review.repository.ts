@@ -265,7 +265,7 @@ export async function getProductRatingSummary(productId: string): Promise<{
  */
 async function updateProductRating(productId: string): Promise<void> {
   await query(
-    `UPDATE "Product" p
+    `UPDATE products p
      SET 
        rating = (
          SELECT COALESCE(AVG(rating), 0)

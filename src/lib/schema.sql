@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "User" (
 );
 
 -- Таблица товаров
-CREATE TABLE IF NOT EXISTS "Product" (
+CREATE TABLE IF NOT EXISTS products (
   "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   "name" TEXT NOT NULL,
   "description" TEXT,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "CartItem" (
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE,
-  FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE CASCADE,
+  FOREIGN KEY ("productId") REFERENCES products ("id") ON DELETE CASCADE,
   UNIQUE ("userId", "productId")
 );
 
@@ -60,12 +60,12 @@ CREATE TABLE IF NOT EXISTS "OrderItem" (
   "price" DECIMAL(10, 2) NOT NULL,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE CASCADE,
-  FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE CASCADE
+  FOREIGN KEY ("productId") REFERENCES products ("id") ON DELETE CASCADE
 );
 
 -- Создаем индексы для ускорения поиска
 CREATE INDEX IF NOT EXISTS "User_email_idx" ON "User"("email");
-CREATE INDEX IF NOT EXISTS "Product_sellerId_idx" ON "Product"("sellerId");
+CREATE INDEX IF NOT EXISTS product_seller_id_idx ON products("sellerId");
 CREATE INDEX IF NOT EXISTS "CartItem_userId_idx" ON "CartItem"("userId");
 CREATE INDEX IF NOT EXISTS "Order_userId_idx" ON "Order"("userId");
 CREATE INDEX IF NOT EXISTS "OrderItem_orderId_idx" ON "OrderItem"("orderId");

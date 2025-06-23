@@ -68,10 +68,10 @@ export default function ProductCard({
           ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
         },
         body: JSON.stringify({
-          productId: id,
-          quantity: 1,
-          size: Array.isArray(size) && size.length > 0 ? size[0] : null,
-          color: Array.isArray(colors) && colors.length > 0 ? colors[0] : null,
+        productId: id,
+        quantity: 1,
+        size: Array.isArray(size) && size.length > 0 ? size[0] : null,
+        color: Array.isArray(colors) && colors.length > 0 ? colors[0] : null,
         })
       });
       if (!res.ok) {

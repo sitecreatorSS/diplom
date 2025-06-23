@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '0');
 
     // Build SQL query conditions
-    let queryStr = 'SELECT * FROM "Product" WHERE 1=1';
+    let queryStr = 'SELECT * FROM products WHERE 1=1';
     const params: (string | number)[] = [];
     let paramIndex = 1;
 
