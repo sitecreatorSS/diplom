@@ -145,27 +145,27 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle className="text-indigo-700">Основная информация</CardTitle>
+              <CardTitle className="text-primary">Основная информация</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Имя</p>
-                <p className="font-medium text-gray-900">{profile.name || 'Не указано'}</p>
+                <p className="text-sm text-muted-foreground">Имя</p>
+                <p className="font-medium text-foreground">{profile.name || 'Не указано'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="font-medium text-gray-900">{profile.email}</p>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium text-foreground">{profile.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Роль</p>
-                <p className="font-medium text-gray-900 capitalize">
+                <p className="text-sm text-muted-foreground">Роль</p>
+                <p className="font-medium text-foreground capitalize">
                   {profile.role === 'ADMIN' ? 'Администратор' : 
                    profile.role === 'SELLER' ? 'Продавец' : 'Покупатель'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Дата регистрации</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-sm text-muted-foreground">Дата регистрации</p>
+                <p className="font-medium text-foreground">
                   {formatDate(profile.createdAt)} ({getDaysSinceRegistered(profile.createdAt)} дней назад)
                 </p>
               </div>
@@ -174,34 +174,34 @@ export default function ProfilePage() {
 
           <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle className="text-indigo-700">Статистика</CardTitle>
+              <CardTitle className="text-primary">Статистика</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Всего заказов</p>
-                <p className="text-2xl font-bold text-indigo-700">{profile._count.orders}</p>
+                <p className="text-sm text-muted-foreground">Всего заказов</p>
+                <p className="text-2xl font-bold text-primary">{profile._count.orders}</p>
               </div>
               
               {profile.role === 'SELLER' && (
                 <div>
-                  <p className="text-sm text-gray-600">Товаров в продаже</p>
-                  <p className="text-2xl font-bold text-indigo-700">{profile._count.products}</p>
+                  <p className="text-sm text-muted-foreground">Товаров в продаже</p>
+                  <p className="text-2xl font-bold text-primary">{profile._count.products}</p>
                 </div>
               )}
               
               <div className="pt-4">
-                <p className="text-sm text-gray-600">Статус аккаунта</p>
+                <p className="text-sm text-muted-foreground">Статус аккаунта</p>
                 {profile.role === 'SELLER' ? (
-                  <div className="mt-2 p-3 bg-green-50 text-green-700 rounded-md border border-green-100">
+                  <div className="mt-2 p-3 bg-green-50 text-primary rounded-md border border-green-100">
                     <p className="font-medium">Вы продавец</p>
                     <p className="text-sm mt-1">Теперь вы можете добавлять и продавать товары</p>
                   </div>
                 ) : profile.sellerApplication ? (
                   <div className={`mt-2 p-3 ${
                     profile.sellerApplication.status === 'PENDING' 
-                      ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' 
-                      : 'bg-red-50 text-red-700 border border-red-100'
-                  } rounded-md`}>
+                      ? 'bg-yellow-50 text-primary border border-yellow-100 rounded-md' 
+                      : 'bg-red-50 text-destructive border border-red-100 rounded-md'
+                  }`}>
                     <p className="font-medium">
                       {profile.sellerApplication.status === 'PENDING' 
                         ? 'Заявка на рассмотрении' 
@@ -240,12 +240,12 @@ export default function ProfilePage() {
         {(profile.role === 'BUYER' && (!profile.sellerApplication || profile.sellerApplication.status === 'REJECTED')) && (
           <Card id="seller-application" className="mt-6 bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
             <CardHeader>
-              <CardTitle className="text-indigo-700">Стать продавцом</CardTitle>
+              <CardTitle className="text-primary">Стать продавцом</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1">
                     Почему вы хотите стать продавцом?
                   </label>
                   <textarea

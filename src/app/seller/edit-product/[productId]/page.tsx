@@ -121,7 +121,7 @@ export default function EditProductPage() {
   if (fetchError) {
      return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div className="bg-red-50 border border-red-200 text-destructive px-4 py-3 rounded relative" role="alert">
           <strong className="font-bold">Error!</strong>
           <span className="block sm:inline"> {fetchError}</span>
         </div>
@@ -197,16 +197,16 @@ export default function EditProductPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-8">Редактировать товар</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-8">Редактировать товар</h1>
       
       {error && !fetchError && ( // Show submit error only if no fetch error
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className="bg-red-100 border border-red-400 text-destructive px-4 py-3 rounded relative mb-4" role="alert">
           <span className="block sm:inline">{error}</span>
         </div>
       )}
 
       {success && ( // Show success message
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className="bg-green-100 border border-green-400 text-primary px-4 py-3 rounded relative mb-4" role="alert">
           <span className="block sm:inline">{success}</span>
         </div>
       )}
@@ -217,11 +217,11 @@ export default function EditProductPage() {
           <input type="hidden" name="id" value={formData.id} />
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Название товара</label>
+            <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">Название товара</label>
             <input type="text" id="name" name="name" value={formData.name || ''} onChange={handleChange} required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+            <label htmlFor="category" className="block text-sm font-medium text-foreground mb-1">Категория</label>
              {/* Replace with dynamic categories later if needed */}
             <select id="category" name="category" value={formData.category || ''} onChange={handleChange} required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Выберите категорию</option>
@@ -234,24 +234,27 @@ export default function EditProductPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Цена (₽)</label>
+            <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">Цена (₽)</label>
             <input type="number" id="price" name="price" value={formData.price || ''} onChange={handleChange} required min="0" step="0.01" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div>
-            <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">На складе</label>
+            <label htmlFor="stock" className="block text-sm font-medium text-foreground mb-1">На складе</label>
             <input type="number" id="stock" name="stock" value={formData.stock || ''} onChange={handleChange} required min="0" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
           </div>
-           <div className="md:col-span-2">\n            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Описание</label>\n            <textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} required rows={4} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>\n          </div>
+           <div className="md:col-span-2">
+            <label htmlFor="description" className="block text-sm font-medium text-foreground mb-1">Описание</label>
+            <textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} required rows={4} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+          </div>
           <div>
-            <label htmlFor="sizes" className="block text-sm font-medium text-gray-700 mb-1">Размеры (через запятую)</label>
+            <label htmlFor="sizes" className="block text-sm font-medium text-foreground mb-1">Размеры (через запятую)</label>
             <input type="text" id="sizes" name="sizes" value={formData.sizes || ''} onChange={handleChange} placeholder="S, M, L, XL" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div>
-            <label htmlFor="colors" className="block text-sm font-medium text-gray-700 mb-1">Цвета (через запятую)</label>
+            <label htmlFor="colors" className="block text-sm font-medium text-foreground mb-1">Цвета (через запятую)</label>
             <input type="text" id="colors" name="colors" value={formData.colors || ''} onChange={handleChange} placeholder="Красный, Синий, Зеленый" className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div className="md:col-span-2">
-            <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">URL изображений (через запятую)</label>
+            <label htmlFor="images" className="block text-sm font-medium text-foreground mb-1">URL изображений (через запятую)</label>
             <input 
               type="text" 
               id="images" 

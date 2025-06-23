@@ -81,7 +81,7 @@ export default function CartPage() {
   if (error) {
     return (
       <main className="container mx-auto px-4 py-8">
-        <div className="text-red-500">Ошибка: {error}</div>
+        <div className="text-destructive">Ошибка: {error}</div>
       </main>
     );
   }
@@ -90,7 +90,7 @@ export default function CartPage() {
     return (
       <main className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Ваша корзина пуста</h1>
-        <p className="text-gray-600 mb-6">Добавьте товары, чтобы они здесь появились.</p>
+        <p className="text-muted-foreground mb-6">Добавьте товары, чтобы они здесь появились.</p>
         <Link href="/">
           <Button>Перейти к покупкам</Button>
         </Link>
@@ -119,13 +119,13 @@ export default function CartPage() {
                 {item.product.name}
               </Link>
               {(item.size || item.color) && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {item.size && `Размер: ${item.size}`}
                   {item.size && item.color && ', '}
                   {item.color && `Цвет: ${item.color}`}
                 </p>
               )}
-              <p className="text-gray-800">{item.product.price} ₽</p>
+              <p className="text-foreground">{item.product.price} ₽</p>
             </div>
             <div className="flex items-center">
               <input

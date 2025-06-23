@@ -66,16 +66,16 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
         
         {/* Header */}
         <div className="sticky top-0 bg-white px-4 py-3 border-b flex justify-between items-center z-10">
-          <h2 className="text-lg font-semibold text-gray-800">Корзина</h2>
+          <h2 className="text-lg font-semibold text-foreground">Корзина</h2>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
-            <X className="h-5 w-5 text-gray-600" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
         {/* Cart Items */}
         <div className="flex-1 px-4 py-6">
           {cartItems.length === 0 ? (
-            <div className="text-center text-gray-500">Ваша корзина пуста</div>
+            <div className="text-center text-muted-foreground">Ваша корзина пуста</div>
           ) : (
             <ul className="space-y-4">
               {cartItems.map((item) => (
@@ -89,12 +89,12 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
                     className="h-20 w-20 object-cover rounded"
                   />
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="font-medium text-foreground">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">
                       {item.price.toFixed(2)} ₽
                     </p>
                     {(item.size || item.color) && (
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {item.size && `Размер: ${item.size}`}
                         {item.size && item.color && ', '}
                         {item.color && `Цвет: ${item.color}`}
@@ -117,7 +117,7 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
                       </button>
                       <button
                         onClick={() => removeItem(item.productId, item.size, item.color)}
-                        className="ml-auto text-red-600 hover:text-red-800"
+                        className="ml-auto text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-5 w-5" />
                       </button>
@@ -132,11 +132,11 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
         {/* Footer / Checkout */}
         <div className="sticky bottom-0 bg-white px-4 py-3 border-t shadow-lg z-10">
            <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-semibold text-gray-800">Итого:</span>
-              <span className="text-lg font-bold text-gray-900">{getTotalPrice().toFixed(2)} ₽</span>
+              <span className="text-lg font-semibold text-foreground">Итого:</span>
+              <span className="text-lg font-bold text-foreground">{getTotalPrice().toFixed(2)} ₽</span>
            </div>
            <Link href="/checkout" onClick={onClose} className="w-full">
-              <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors">
+              <button className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md text-lg font-semibold hover:bg-primary/90 transition-colors">
                  Перейти к оформлению
               </button>
            </Link>

@@ -69,16 +69,16 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-4">
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
                 Магазин одежды
               </span>
             </Link>
 
             <div className="hidden md:flex space-x-8">
-              <Link href="/catalog" className="text-gray-800 hover:text-gray-900 transition-colors">
+              <Link href="/catalog" className="text-foreground hover:text-primary transition-colors">
                 Каталог
               </Link>
-              <Link href="/about" className="text-gray-800 hover:text-gray-900 transition-colors">
+              <Link href="/about" className="text-foreground hover:text-primary transition-colors">
                 О нас
               </Link>
             </div>
@@ -86,7 +86,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button onClick={toggleCart} className="p-2 rounded-full hover:bg-gray-100">
-              <ShoppingCart className="h-5 w-5 text-gray-800" />
+              <ShoppingCart className="h-5 w-5 text-foreground" />
             </button>
 
             {session ? (

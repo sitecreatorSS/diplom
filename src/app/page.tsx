@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <main className="pt-16">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white h-[500px] flex items-center justify-center">
+      <section className="relative bg-gradient-to-r from-primary to-primary text-primary-foreground h-[500px] flex items-center justify-center">
         <div className="absolute inset-0 z-0 opacity-30">
            {/* Пример использования фонового изображения - замените на ваше, если есть */}
           {/* <Image src="/path/to/your/hero-image.jpg" alt="Магазин одежды" layout="fill" objectFit="cover" /> */}
@@ -48,8 +48,8 @@ export default function HomePage() {
       {/* About Us Snippet Section */}
       <section className="bg-gray-100 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">О нас</h2>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
+          <h2 className="text-3xl font-bold text-foreground mb-6">О нас</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
             Мы предлагаем широкий ассортимент стильной и качественной одежды для всех. 
             Наша миссия - помочь вам выразить себя через моду, предлагая только лучшие товары от проверенных продавцов.
           </p>

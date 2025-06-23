@@ -94,13 +94,13 @@ export default function CatalogPage() { // Renamed from Home
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700">
-                {error}. <button onClick={() => window.location.reload()} className="font-medium underline hover:text-red-600">Попробовать снова</button>
+              <p className="text-sm text-destructive">
+                {error}. <button onClick={() => window.location.reload()} className="font-medium underline hover:text-destructive">Попробовать снова</button>
               </p>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function CatalogPage() { // Renamed from Home
     <main className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Наши товары</h1>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           Показано <span className="font-medium">{products.length}</span> товаров
         </div>
       </div>
@@ -157,13 +157,13 @@ export default function CatalogPage() { // Renamed from Home
               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
             />
           </svg>
-          <h3 className="mt-2 text-lg font-medium text-gray-900">Товары не найдены</h3>
-          <p className="mt-1 text-gray-500">Попробуйте изменить параметры поиска или фильтры.</p>
+          <h3 className="mt-2 text-lg font-medium text-foreground">Товары не найдены</h3>
+          <p className="mt-1 text-muted-foreground">Попробуйте изменить параметры поиска или фильтры.</p>
           <div className="mt-6">
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Обновить страницу
             </button>
