@@ -29,3 +29,16 @@ export async function GET(request: Request) {
        FROM products p
        JOIN "User" u ON p.seller_id = u.id
        ORDER BY p.created_at DESC`
+    );
+    const products = result.rows.map(row => ({
+      ...row,
+      seller: { name: row.seller_name },
+    }));
+    return NextResponse.json(products);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Ошибка при получении товаров' },
+      { status: 500 }
+    );
+  }
+}
