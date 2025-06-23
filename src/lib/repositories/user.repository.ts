@@ -8,7 +8,7 @@ type UserUpdateInput = Partial<Omit<User, 'id' | 'email' | 'createdAt' | 'update
  * Найти пользователя по email
  */
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const result = await query('SELECT * FROM "User" WHERE email = $1', [email]);
+  const result = await query('SELECT * FROM users WHERE email = $1', [email]);
   return result.rows[0] || null;
 }
 
@@ -16,7 +16,7 @@ export async function findUserByEmail(email: string): Promise<User | null> {
  * Найти пользователя по ID
  */
 export async function findUserById(id: string): Promise<User | null> {
-  const result = await query('SELECT * FROM "User" WHERE id = $1', [id]);
+  const result = await query('SELECT * FROM users WHERE id = $1', [id]);
   return result.rows[0] || null;
 }
 
@@ -39,7 +39,7 @@ export async function createUser(userData: UserCreateInput): Promise<User> {
   } = userData;
   
   const result = await query(
-    `INSERT INTO "User" (
+    `INSERT INTO users (
       email, name, password, role, image, phone, 
       address, city, country, "postal_code", "is_active"
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
@@ -83,7 +83,7 @@ export async function updateUser(
   } = userData;
   
   const result = await query(
-    `UPDATE "User" 
+    `UPDATE users 
      SET 
        name = COALESCE($1, name),
        password = COALESCE($2, password),

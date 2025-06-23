@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       created_at: Date;
     }>(
       `SELECT id, name, email, role, created_at 
-       FROM "User" 
+       FROM users 
        ORDER BY created_at DESC`
     );
     const users = result.rows;

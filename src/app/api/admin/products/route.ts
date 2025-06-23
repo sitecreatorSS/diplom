@@ -27,7 +27,7 @@ export async function GET(request: Request) {
          p.*, 
          u.name as seller_name
        FROM products p
-       JOIN "User" u ON p.seller_id = u.id
+       JOIN users u ON p.seller_id = u.id
        ORDER BY p.created_at DESC`
     );
     const products = result.rows.map(row => ({

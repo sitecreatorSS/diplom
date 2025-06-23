@@ -30,7 +30,7 @@ export async function GET() {
         COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers,
         (SELECT COUNT(*) FROM "Product") as total_products,
         (SELECT COUNT(*) FROM "SellerApplication" WHERE status = 'PENDING') as pending_applications
-      FROM "User"
+      FROM users
     `);
 
     const stats = statsResult.rows[0];

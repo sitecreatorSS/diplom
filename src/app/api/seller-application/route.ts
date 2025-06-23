@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     // Получаем пользователя
     const userResult = await query(
-      'SELECT * FROM "User" WHERE email = $1',
+      'SELECT * FROM users WHERE email = $1',
       [session.user.email]
     );
     const user = userResult.rows[0];
@@ -98,7 +98,7 @@ export async function GET() {
       `SELECT 
         u.*,
         sa.*
-      FROM "User" u
+      FROM users u
       LEFT JOIN "SellerApplication" sa ON u.id = sa.user_id
       WHERE u.email = $1`,
       [session.user.email]

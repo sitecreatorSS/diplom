@@ -20,7 +20,7 @@ export async function GET() {
          u.name as user_name,
          u.email as user_email
        FROM "SellerApplication" sa
-       JOIN "User" u ON sa."userId" = u.id
+       JOIN users u ON sa."userId" = u.id
        ORDER BY sa.created_at DESC`
     );
 

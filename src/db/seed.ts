@@ -35,7 +35,7 @@ async function seed() {
       
       let adminId: string | number;
       const existingAdmins = await query<UserRow>(
-        'SELECT id FROM "User" WHERE email = $1',
+        'SELECT id FROM users WHERE email = $1',
         [adminEmail]
       );
 
@@ -49,7 +49,7 @@ async function seed() {
         console.log('Admin user created successfully!');
         // Получаем id только что созданного пользователя
         const newAdmin = await query<UserRow>(
-          'SELECT id FROM "User" WHERE email = $1',
+          'SELECT id FROM users WHERE email = $1',
           [adminEmail]
         );
         adminId = newAdmin.rows[0].id;

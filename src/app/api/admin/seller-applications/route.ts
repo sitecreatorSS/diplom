@@ -24,7 +24,7 @@ export async function GET() {
           'createdAt', u.created_at
         ) as user
       FROM "SellerApplication" sa
-      JOIN "User" u ON sa.user_id = u.id
+      JOIN users u ON sa.user_id = u.id
       ORDER BY sa.created_at DESC
     `);
 
@@ -34,7 +34,7 @@ export async function GET() {
         COUNT(*) as total_users,
         COUNT(*) FILTER (WHERE role = 'SELLER') as total_sellers,
         COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers
-      FROM "User"
+      FROM users
     `);
 
     const stats = statsResult.rows[0];
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       const applicationResult = await query(
         `SELECT sa.*, u.id as user_id, u.role as user_role
          FROM "SellerApplication" sa
-         JOIN "User" u ON sa.user_id = u.id
+         JOIN users u ON sa.user_id = u.id
          WHERE sa.id = $1`,
         [applicationId]
       );

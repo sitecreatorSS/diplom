@@ -21,7 +21,7 @@ export async function GET() {
         email,
         role,
         created_at as "createdAt"
-      FROM "User"
+      FROM users
       ORDER BY created_at DESC
     `);
 
@@ -47,7 +47,7 @@ export async function PUT(request: Request) {
 
     // Обновляем пользователя в базе данных
     const result = await query(`
-      UPDATE "User"
+      UPDATE users
       SET 
         name = $1,
         email = $2,
@@ -91,7 +91,7 @@ export async function DELETE(request: Request) {
     }
 
     // Удаляем пользователя из базы данных
-    await query('DELETE FROM "User" WHERE id = $1', [id]);
+    await query('DELETE FROM users WHERE id = $1', [id]);
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

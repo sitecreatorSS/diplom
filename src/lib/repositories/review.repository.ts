@@ -77,7 +77,7 @@ export async function findReviews(
   const result = await query(
     `SELECT r.*, u.name as "userName", u.image as "userImage"
      ${queryStr}
-     LEFT JOIN "User" u ON r."userId" = u.id`,
+     LEFT JOIN users u ON r."userId" = u.id`,
     queryParams
   );
 
@@ -94,7 +94,7 @@ export async function findReviewById(id: string): Promise<Review | null> {
   const result = await query(
     `SELECT r.*, u.name as "userName", u.image as "userImage"
      FROM "Review" r
-     LEFT JOIN "User" u ON r."userId" = u.id
+     LEFT JOIN users u ON r."userId" = u.id
      WHERE r.id = $1`,
     [id]
   );

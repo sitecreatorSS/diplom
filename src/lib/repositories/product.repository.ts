@@ -186,7 +186,7 @@ export async function updateProductStock(
 
 export async function checkProductOwner(productId: string, userId: string, requiredRole: UserRole = 'ADMIN'): Promise<boolean> {
   if (requiredRole === 'ADMIN') {
-    const userResult = await query('SELECT role FROM "User" WHERE id = $1', [userId]);
+    const userResult = await query('SELECT role FROM users WHERE id = $1', [userId]);
     if (userResult.rows[0]?.role === 'ADMIN') {
       return true;
     }
