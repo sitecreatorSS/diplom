@@ -56,11 +56,13 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     addToCart({
-      productId: Number(id),
+      productId: id,
       name,
       price,
-      image: images && images[0] ? images[0].url : '',
+      imageUrl: images && images[0] ? images[0].url : '',
       quantity: 1,
+      size: null,
+      color: null,
     });
     // Визуальный отклик
     const button = e.currentTarget as HTMLButtonElement;
