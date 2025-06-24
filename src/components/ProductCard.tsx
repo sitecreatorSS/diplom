@@ -61,7 +61,7 @@ export default function ProductCard({
 
     try {
       const accessToken = (session as any).accessToken;
-      const res = await fetch('/api/cart', {
+      const res = await fetch('/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
