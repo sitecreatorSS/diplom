@@ -38,7 +38,7 @@ COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
 # Устанавливаем только production зависимости
-RUN npm ci --only=production --no-audit
+RUN npm ci --omit=dev --no-audit
 
 # Копируем собранное приложение из предыдущего этапа
 COPY --from=base /app/.next ./.next
