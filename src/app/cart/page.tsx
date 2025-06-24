@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 
@@ -105,14 +104,7 @@ export default function CartPage() {
         {cartItems.map((item) => (
           <div key={item.id} className="flex items-center border-b pb-4">
             <div className="flex-shrink-0 mr-4">
-              <Image
-                src={item.product.imageUrl || '/placeholder-product.jpg'}
-                alt={item.product.name}
-                width={80}
-                height={80}
-                objectFit="cover"
-                className="rounded-md"
-              />
+              {/* Placeholder for the image */}
             </div>
             <div className="flex-grow">
               <Link href={`/products/${item.productId}`} className="text-lg font-semibold hover:underline">

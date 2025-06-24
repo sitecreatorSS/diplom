@@ -63,6 +63,13 @@ export async function POST(request: Request) {
       email,
       password: hashedPassword,
       role: 'BUYER', // По умолчанию регистрируем как покупателя
+      image: null,
+      phone: null,
+      address: null,
+      city: null,
+      country: null,
+      postalCode: null,
+      isActive: true
     });
 
     const { password: _, ...userWithoutPassword } = user;

@@ -1,7 +1,7 @@
 import { query } from '../db';
 import { User, UserRole, SellerApplication } from '@/types/database';
 
-type UserCreateInput = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'emailVerified' | 'lastLogin'>;
+type UserCreateInput = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'emailVerified' | 'lastLogin' | 'created_at' | 'updated_at'>;
 type UserUpdateInput = Partial<Omit<User, 'id' | 'email' | 'createdAt' | 'updatedAt' | 'emailVerified' | 'lastLogin'>>;
 
 /**

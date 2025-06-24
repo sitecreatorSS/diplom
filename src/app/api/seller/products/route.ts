@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { User } from '@/types/database';
 
 // Helper function to check if the user is a seller
 async function isSeller(session: any) {
@@ -11,10 +12,10 @@ async function isSeller(session: any) {
 // GET /api/seller/products - Get products for the logged-in seller
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as { user?: User };
 
     // Check if user is authenticated and is a seller
-    if (!session || session.user.role !== 'SELLER') {
+    if (!session?.user || session.user.role !== 'SELLER') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -57,13 +58,10 @@ export async function GET() {
 // POST /api/seller/products - Add a new product
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    // Check if user is authenticated and is a seller
-    if (!session || session.user.role !== 'SELLER') {
+    const session = await getServerSession(authOptions) as { user?: User };
+    if (!session?.user || session.user.role !== 'SELLER') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
-
     const sellerId = session.user.id;
     const body = await request.json();
     const { name, description, price, stock, category, sizes, colors, images } = body;
@@ -155,13 +153,10 @@ export async function POST(request: Request) {
 // PUT /api/seller/products - Update an existing product
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    // Check if user is authenticated and is a seller
-    if (!session || session.user.role !== 'SELLER') {
+    const session = await getServerSession(authOptions) as { user?: User };
+    if (!session?.user || session.user.role !== 'SELLER') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
-
     const sellerId = session.user.id;
     const body = await request.json();
     const { id, name, description, price, stock, category, sizes, colors, images } = body;
@@ -269,13 +264,10 @@ export async function PUT(request: Request) {
 // DELETE /api/seller/products - Delete a product
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    // Check if user is authenticated and is a seller
-    if (!session || session.user.role !== 'SELLER') {
+    const session = await getServerSession(authOptions) as { user?: User };
+    if (!session?.user || session.user.role !== 'SELLER') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
-
     const sellerId = session.user.id;
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
 
 interface ProductImageSliderProps {
   images: { url: string; alt?: string }[];
@@ -71,14 +70,7 @@ export function ProductImageSlider({ images, className = '' }: ProductImageSlide
           }}
           className="w-full h-full"
         >
-          <Image
-            src={images[currentImageIndex].url}
-            alt={images[currentImageIndex].alt || 'Изображение товара'}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            priority={currentImageIndex === 0}
-          />
+          {/* Placeholder for the Image component */}
         </motion.div>
       </AnimatePresence>
 

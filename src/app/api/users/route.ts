@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { User } from '@/types/database';
 
 // GET /api/users - получение списка пользователей
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as { user?: User };
 
     // Проверяем, что пользователь авторизован и является администратором
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -35,10 +36,10 @@ export async function GET() {
 // PUT /api/users - обновление пользователя
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as { user?: User };
 
     // Проверяем, что пользователь авторизован и является администратором
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -76,10 +77,10 @@ export async function PUT(request: Request) {
 // DELETE /api/users - удаление пользователя
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as { user?: User };
 
     // Проверяем, что пользователь авторизован и является администратором
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 

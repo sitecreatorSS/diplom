@@ -2,10 +2,11 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { findUserByEmail } from "@/lib/repositories/user.repository";
+import { User } from '@/types/database';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as { user?: User };
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: "Вы не авторизованы" },

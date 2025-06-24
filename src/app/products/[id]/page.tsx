@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 
@@ -123,14 +122,9 @@ export default function ProductDetailsPage() {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2">
           {product.images && product.images.length > 0 ? (
-            <Image
-              src={product.images[0].url}
-              alt={product.images[0].alt || product.name}
-              width={600}
-              height={600}
-              objectFit="contain"
-              className="rounded-lg shadow-sm"
-            />
+            <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg shadow-sm">
+              <span className="text-muted-foreground">Нет изображения</span>
+            </div>
           ) : (
             <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg shadow-sm">
               <span className="text-muted-foreground">Нет изображения</span>
