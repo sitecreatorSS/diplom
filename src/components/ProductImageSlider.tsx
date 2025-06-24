@@ -71,14 +71,10 @@ export function ProductImageSlider({ images, className = '' }: ProductImageSlide
           }}
           className="w-full h-full"
         >
-          <Image
+          <img
             src={images[currentImageIndex].url}
             alt={images[currentImageIndex].alt || 'Изображение товара'}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            priority={currentImageIndex === 0}
-            quality={80}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         </motion.div>
       </AnimatePresence>
