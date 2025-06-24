@@ -1,27 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
 import { useCartContext } from '@/context/CartContext';
 
-interface CartItem {
-  id: string;
-  productId: string;
-  quantity: number;
-  size: string | null;
-  color: string | null;
-  product: { // Assuming product details are included
-    id: string;
-    name: string;
-    price: number;
-    imageUrl: string; // Assuming imageUrl is available
-  };
-}
-
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCartContext();
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCartContext();
 
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -45,15 +29,22 @@ export default function CartPage() {
       <h1 className="text-2xl font-bold mb-6">Ваша корзина</h1>
       <div className="grid gap-6">
         {cart.map((item) => (
-          <div key={item.productId} className="flex items-center border-b pb-4">
+          <div key={`${item.productId}-${item.size}-${item.color}`} className="flex items-center border-b pb-4">
             <div className="flex-shrink-0 mr-4">
-              <img src={item.image} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
+              <img src={item.imageUrl} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
             </div>
             <div className="flex-grow">
               <Link href={`/products/${item.productId}`} className="text-lg font-semibold hover:underline">
                 {item.name}
               </Link>
               <p className="text-foreground">{item.price} ₽</p>
+              {(item.size || item.color) && (
+                <p className="text-sm text-gray-500">
+                  {item.size && `Размер: ${item.size}`}
+                  {item.size && item.color && ', '}
+                  {item.color && `Цвет: ${item.color}`}
+                </p>
+              )}
             </div>
             <div className="flex items-center">
               <input
@@ -63,14 +54,12 @@ export default function CartPage() {
                 onChange={(e) => {
                   const qty = parseInt(e.target.value);
                   if (qty > 0) {
-                    removeFromCart(item.productId);
-                    // addToCart с новым количеством
-                    // (можно реализовать через useCart, если нужно)
+                    updateQuantity(item.productId, item.size, item.color, qty);
                   }
                 }}
                 className="w-16 border rounded-md text-center mr-4"
               />
-              <Button variant="outline" size="sm" onClick={() => removeFromCart(item.productId)}>
+              <Button variant="outline" size="sm" onClick={() => removeFromCart(item.productId, item.size, item.color)}>
                 Удалить
               </Button>
             </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { useCartContext } from '@/context/CartContext';
 
 interface Product {
   id: string;
@@ -24,6 +25,7 @@ interface Product {
 export default function ProductDetailsPage() {
   const params = useParams();
   const productId = params.id as string;
+  const { addToCart } = useCartContext();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -178,7 +180,22 @@ export default function ProductDetailsPage() {
 
           <p className="text-sm text-muted-foreground mb-4">В наличии: {product.stock}</p>
 
-          <Button className="w-full md:w-auto">Добавить в корзину</Button>
+<Button className="w-full md:w-auto" onClick={() => {
+            if (!selectedSize || !selectedColor) {
+              alert('Пожалуйста, выберите размер и цвет перед добавлением в корзину.');
+              return;
+            }
+            addToCart({
+              productId: product.id,
+              name: product.name,
+              price: product.price,
+              imageUrl: product.images[0]?.url || '',
+              quantity: 1,
+              size: selectedSize,
+              color: selectedColor
+            });
+            alert('Товар добавлен в корзину!');
+          }}>Добавить в корзину</Button>
 
           {/* Render stock edit form based on user role */}
           {renderStockEditForm()}

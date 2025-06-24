@@ -15,6 +15,7 @@ import {
 } from './ui/dropdown-menu';
 import { useState } from 'react';
 import CartWidgetNew from './CartWidgetNew';
+import { useCartContext } from '@/context/CartContext';
 
 interface CustomSession extends Session {
   user: {
@@ -39,29 +40,13 @@ interface CartItem {
 export default function Navbar() {
   const { data: session } = useSession() as { data: CustomSession | null };
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartDataFromStorage, setCartDataFromStorage] = useState<CartItem[]>([]);
+  const { cart } = useCartContext();
 
   const toggleCart = () => {
-    if (!isCartOpen) {
-      const storedCart = localStorage.getItem('cart');
-      if (storedCart) {
-        try {
-          const parsedCart = JSON.parse(storedCart) as CartItem[];
-          const cartItemsWithParsedPrice = parsedCart.map((item) => ({
-            ...item,
-            price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
-          }));
-          setCartDataFromStorage(cartItemsWithParsedPrice);
-        } catch (error) {
-          console.error('Failed to parse cart data from localStorage:', error);
-          setCartDataFromStorage([]);
-        }
-      } else {
-        setCartDataFromStorage([]);
-      }
-    }
     setIsCartOpen(!isCartOpen);
   };
+
+  const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -85,8 +70,13 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <button onClick={toggleCart} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={toggleCart} className="relative p-2 rounded-full hover:bg-gray-100">
               <ShoppingCart className="h-5 w-5 text-foreground" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
             </button>
 
             {session ? (
@@ -162,7 +152,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {isCartOpen && <CartWidgetNew onClose={() => setIsCartOpen(false)} cartData={cartDataFromStorage} />}
+      {isCartOpen && <CartWidgetNew onClose={() => setIsCartOpen(false)} />}
     </nav>
   );
 }

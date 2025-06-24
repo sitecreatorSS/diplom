@@ -1,53 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-
-interface CartItem {
-  productId: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  quantity: number;
-  size: string | null;
-  color: string | null;
-}
+import { useCartContext } from '@/context/CartContext';
 
 interface CartWidgetProps {
   onClose: () => void;
-  cartData: CartItem[];
 }
 
-export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(cartData);
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const updateQuantity = (productId: string, size: string | null, color: string | null, delta: number) => {
-    setCartItems((currentItems: CartItem[]) =>
-      currentItems.map((item: CartItem) => {
-        if (item.productId === productId && item.size === size && item.color === color) {
-          const newQuantity = item.quantity + delta;
-          return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
-        }
-        return item;
-      }).filter(Boolean) as CartItem[]
-    );
-  };
-
-  const removeItem = (productId: string, size: string | null, color: string | null) => {
-    setCartItems((currentItems: CartItem[]) =>
-      currentItems.filter(
-        (item: CartItem) => !(item.productId === productId && item.size === size && item.color === color)
-      )
-    );
-  };
+export default function CartWidgetNew({ onClose }: CartWidgetProps) {
+  const { cart, updateQuantity, removeFromCart } = useCartContext();
 
   const getTotalPrice = (): number => {
-    return cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0);
+    return cart.reduce((total: number, item) => total + item.price * item.quantity, 0);
   };
 
   return (
@@ -66,13 +31,13 @@ export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
 
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-4">
-          {cartItems.length === 0 ? (
+          {cart.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
               Ваша корзина пуста
             </div>
           ) : (
             <div className="space-y-4">
-              {cartItems.map((item) => (
+              {cart.map((item) => (
                 <div 
                   key={`${item.productId}-${item.size}-${item.color}`}
                   className="flex gap-4 border-b pb-4"
@@ -96,7 +61,7 @@ export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
                     )}
                     <div className="mt-2 flex items-center gap-2">
                       <button
-                        onClick={() => updateQuantity(item.productId, item.size, item.color, -1)}
+                        onClick={() => updateQuantity(item.productId, item.size, item.color, item.quantity - 1)}
                         className="rounded border p-1 hover:bg-gray-100"
                         disabled={item.quantity <= 1}
                       >
@@ -104,13 +69,13 @@ export default function CartWidgetNew({ onClose, cartData }: CartWidgetProps) {
                       </button>
                       <span className="w-8 text-center">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.productId, item.size, item.color, 1)}
+                        onClick={() => updateQuantity(item.productId, item.size, item.color, item.quantity + 1)}
                         className="rounded border p-1 hover:bg-gray-100"
                       >
                         <Plus className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => removeItem(item.productId, item.size, item.color)}
+                        onClick={() => removeFromCart(item.productId, item.size, item.color)}
                         className="ml-auto text-red-600 hover:text-red-800"
                       >
                         <Trash2 className="h-5 w-5" />
