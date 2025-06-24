@@ -50,9 +50,15 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const productId = params.id;
-    // Удаляем товар из базы данных
-    await query('DELETE FROM "Product" WHERE id = $1', [productId]);
-    return NextResponse.json({ success: true });
+    // Дополнительная проверка прав (например, только админ может удалять)
+    // const session = await getServerSession(authOptions);
+    // if (session?.user?.role !== 'ADMIN') {
+    //   return NextResponse.json({ message: 'У вас нет прав для этого действия' }, { status: 403 });
+    // }
+
+    await query('DELETE FROM products WHERE id = $1', [productId]);
+
+    return NextResponse.json({ message: 'Товар успешно удален' });
   } catch (error) {
     console.error('Product delete error:', error);
     return NextResponse.json({ error: 'Ошибка при удалении товара' }, { status: 500 });

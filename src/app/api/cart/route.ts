@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       );
     } else {
       const productPriceResult = await query<{ price: number }>(
-        `SELECT price FROM "Product" WHERE id = $1`,
+        `SELECT price FROM products WHERE id = $1`,
         [productId]
       );
       const priceAtAddition = productPriceResult.rows[0]?.price || 0;

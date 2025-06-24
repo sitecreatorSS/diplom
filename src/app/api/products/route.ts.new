@@ -30,75 +30,76 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '0');
 
     // Build SQL query conditions
-    let queryStr = 'SELECT * FROM "Product" WHERE 1=1';
+    const whereClauses: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
 
     if (category) {
-      queryStr += ` AND "category" = $${paramIndex++}`;
+      whereClauses.push(`p.category = $${paramIndex++}`);
       params.push(category);
     }
 
     if (search) {
-      queryStr += ` AND ("name" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`;
+      whereClauses.push(`(p.name ILIKE $${paramIndex} OR p.description ILIKE $${paramIndex})`);
       params.push(`%${search}%`);
       paramIndex++;
     }
 
-    // Get total count
-    const countQuery = `SELECT COUNT(*) as total FROM (${queryStr}) as subquery`;
+    const whereStr = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+    const baseQuery = `
+      FROM products p
+      LEFT JOIN users u ON p.seller_id = u.id
+    `;
+    
+    const countQuery = `SELECT COUNT(DISTINCT p.id) as total ${baseQuery} ${whereStr}`;
     const totalResult = await query(countQuery, params);
     const total = parseInt(totalResult.rows[0].total, 10);
 
-    // Add ordering and limit
-    queryStr += ' ORDER BY "createdAt" DESC';
+    let productsQuery = `
+      SELECT 
+        p.*, 
+        u.name as seller_name,
+        (
+          SELECT json_agg(json_build_object('url', pi.url, 'alt', p.name))
+          FROM product_images pi
+          WHERE pi.product_id = p.id
+        ) as images
+      ${baseQuery}
+      ${whereStr}
+      GROUP BY p.id, u.id
+      ORDER BY p.created_at DESC
+    `;
+
     if (limit > 0) {
-      queryStr += ` LIMIT $${paramIndex}`;
+      productsQuery += ` LIMIT $${paramIndex}`;
       params.push(limit);
     }
 
-    // Get products
-    const result = await query(queryStr, params);
+    const result = await query(productsQuery, params);
     const products = result.rows;
 
     // Transform products
-    const transformedProducts = await Promise.all(products.map(async (product: any) => {
-      // Get seller info
-      const seller = await findUserById(product.sellerId);
-      
-      // Get product images (assuming we have an images table)
-      // TODO: Implement image repository
-      const images = [];
-      if (product.image) {
-        images.push({
-          id: product.id,
-          url: product.image,
-          alt: product.name,
-        });
-      }
-
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        category: product.category,
-        stock: product.stock,
-        rating: generateRandomRating(),
-        reviewCount: Math.floor(Math.random() * 100) + 1, // Random review count for demo
-        seller: {
-          id: seller?.id || '',
-          name: seller?.name || 'Unknown Seller',
-        },
-        images,
-        image: product.image || '/placeholder-product.jpg',
-        specifications: tryParseJson<Record<string, string>>(
-          product.specifications,
-          {}
-        ),
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-      };
+    const transformedProducts = products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      stock: product.stock,
+      rating: generateRandomRating(),
+      reviewCount: Math.floor(Math.random() * 100) + 1,
+      seller: {
+        id: product.seller_id || '',
+        name: product.seller_name || 'Unknown Seller',
+      },
+      images: product.images || [],
+      specifications: tryParseJson<Record<string, string>>(
+        product.specifications,
+        {}
+      ),
+      createdAt: product.created_at,
+      updatedAt: product.updated_at,
     }));
 
     return NextResponse.json({

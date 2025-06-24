@@ -25,23 +25,20 @@ export async function GET() {
 
     // Получаем статистику одним запросом
     const statsResult = await query(`
-      SELECT 
-        COUNT(*) as total_users,
-        COUNT(*) FILTER (WHERE role = 'SELLER') as total_sellers,
-        COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers,
-        (SELECT COUNT(*) FROM "Product") as total_products,
-        (SELECT COUNT(*) FROM "SellerApplication" WHERE status = 'PENDING') as pending_applications
-      FROM users
+      SELECT
+        (SELECT COUNT(*) FROM users) as total_users,
+        (SELECT COUNT(*) FROM products) as total_products,
+        (SELECT COUNT(*) FROM "Order") as total_orders,
+        (SELECT SUM(total) FROM "Order" WHERE status = 'DELIVERED') as total_revenue
     `);
 
     const stats = statsResult.rows[0];
 
     return NextResponse.json({
       totalUsers: parseInt(stats.total_users),
-      totalSellers: parseInt(stats.total_sellers),
-      totalBuyers: parseInt(stats.total_buyers),
       totalProducts: parseInt(stats.total_products),
-      pendingApplications: parseInt(stats.pending_applications)
+      totalOrders: parseInt(stats.total_orders),
+      totalRevenue: parseFloat(stats.total_revenue)
     });
   } catch (error) {
     console.error('Error fetching admin stats:', error);

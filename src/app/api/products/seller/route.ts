@@ -24,8 +24,8 @@ export async function GET(request: Request) {
 
     const result = await query<Product>(
       `SELECT * 
-       FROM "Product" 
-       WHERE "sellerId" = $1 
+       FROM products 
+       WHERE seller_id = $1 
        ORDER BY created_at DESC`,
       [userId]
     );

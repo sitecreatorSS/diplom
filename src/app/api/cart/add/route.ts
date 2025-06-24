@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     // Получаем цену товара
     const productResult = await query(
-      'SELECT price FROM "Product" WHERE id = $1',
+      'SELECT price FROM products WHERE id = $1',
       [productId]
     );
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     // Проверяем существующий товар в корзине
     const existingItemResult = await query(
-      `SELECT * FROM "CartItem" 
+      `SELECT * FROM cart_items 
        WHERE user_id = $1 
        AND product_id = $2 
        AND (size = $3 OR (size IS NULL AND $3 IS NULL))
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     if (existingItemResult.rows.length > 0) {
       // Обновляем количество существующего товара
       const result = await query(
-        `UPDATE "CartItem"
+        `UPDATE cart_items
          SET 
            quantity = quantity + $1,
            updated_at = NOW()
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     } else {
       // Создаем новый товар в корзине
       const result = await query(
-        `INSERT INTO "CartItem" (
+        `INSERT INTO cart_items (
           user_id, product_id, quantity, size, color, 
           price_at_addition, created_at, updated_at
         ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())

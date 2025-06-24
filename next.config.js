@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'githubusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'shop5-production.up.railway.app',
+      },
       // Добавь другие домены, если используешь их для картинок
     ],
   },

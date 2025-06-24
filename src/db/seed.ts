@@ -81,7 +81,7 @@ async function seed() {
       }
 
       // 4. Добавляем тестовые товары, если их нет
-      const { rows: existingProducts } = await query<CategoryRow>('SELECT id FROM "Product" LIMIT 1');
+      const { rows: existingProducts } = await query<CategoryRow>('SELECT id FROM products LIMIT 1');
 
       if (existingProducts.length === 0) {
         console.log('Creating test products...');

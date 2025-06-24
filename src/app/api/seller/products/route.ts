@@ -33,8 +33,8 @@ export async function GET() {
             'order', pi."order"
           ) ORDER BY pi."order"
         ) as images
-      FROM "Product" p
-      LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+      FROM products p
+      LEFT JOIN product_images pi ON p.id = pi.product_id
       WHERE p.seller_id = $1
       GROUP BY p.id
       ORDER BY p.created_at DESC
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     try {
       // Создаем товар
       const productResult = await query(
-        `INSERT INTO "Product" (
+        `INSERT INTO products (
           name, description, price, stock, category, 
           sizes, colors, seller_id, rating, num_reviews,
           created_at, updated_at
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         await query(
-          `INSERT INTO "ProductImage" (
+          `INSERT INTO product_images (
             product_id, url, alt_text, "order", created_at, updated_at
           ) VALUES ($1, $2, $3, $4, NOW(), NOW())`,
           [
@@ -125,8 +125,8 @@ export async function POST(request: Request) {
               'order', pi."order"
             ) ORDER BY pi."order"
           ) as images
-        FROM "Product" p
-        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE p.id = $1
         GROUP BY p.id`,
         [product.id]
@@ -167,7 +167,7 @@ export async function PUT(request: Request) {
 
     // Verify the product belongs to the seller
     const existingProductResult = await query(
-      'SELECT id FROM "Product" WHERE id = $1 AND seller_id = $2',
+      'SELECT id FROM products WHERE id = $1 AND seller_id = $2',
       [id, sellerId]
     );
 
@@ -181,7 +181,7 @@ export async function PUT(request: Request) {
     try {
       // Обновляем товар
       const productResult = await query(
-        `UPDATE "Product"
+        `UPDATE products
         SET 
           name = $1,
           description = $2,
@@ -206,13 +206,13 @@ export async function PUT(request: Request) {
       );
 
       // Удаляем старые изображения
-      await query('DELETE FROM "ProductImage" WHERE product_id = $1', [id]);
+      await query('DELETE FROM product_images WHERE product_id = $1', [id]);
 
       // Добавляем новые изображения
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         await query(
-          `INSERT INTO "ProductImage" (
+          `INSERT INTO product_images (
             product_id, url, alt_text, "order", created_at, updated_at
           ) VALUES ($1, $2, $3, $4, NOW(), NOW())`,
           [
@@ -236,8 +236,8 @@ export async function PUT(request: Request) {
               'order', pi."order"
             ) ORDER BY pi."order"
           ) as images
-        FROM "Product" p
-        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE p.id = $1
         GROUP BY p.id`,
         [id]
@@ -278,7 +278,7 @@ export async function DELETE(request: Request) {
 
     // Verify the product belongs to the seller
     const existingProductResult = await query(
-      'SELECT id FROM "Product" WHERE id = $1 AND seller_id = $2',
+      'SELECT id FROM products WHERE id = $1 AND seller_id = $2',
       [productId, sellerId]
     );
 
@@ -291,10 +291,10 @@ export async function DELETE(request: Request) {
 
     try {
       // Удаляем изображения товара
-      await query('DELETE FROM "ProductImage" WHERE product_id = $1', [productId]);
+      await query('DELETE FROM product_images WHERE product_id = $1', [productId]);
 
       // Удаляем товар
-      await query('DELETE FROM "Product" WHERE id = $1', [productId]);
+      await query('DELETE FROM products WHERE id = $1', [productId]);
 
       await query('COMMIT');
 
