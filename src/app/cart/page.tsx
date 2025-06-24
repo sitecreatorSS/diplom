@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
 
 interface CartItem {
   id: string;
@@ -20,72 +21,14 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { cart, removeFromCart, clearCart } = useCart();
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setIsLoading(true);
-        // Replace with your actual API endpoint for fetching cart data
-        const response = await fetch('/api/cart'); 
-        
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить корзину');
-        }
-        
-        const data = await response.json();
-        // Assuming the API returns an object with an 'items' array
-        setCartItems(data.items || []); 
-
-      } catch (err) {
-        console.error('Ошибка при получении корзины:', err);
-        setError(err instanceof Error ? err.message : 'Произошла ошибка');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCart();
-  }, []);
-
-  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
-    // TODO: Implement API call to update item quantity
-    console.log(`Update item ${itemId} quantity to ${newQuantity}`);
-    // After successful API call, refetch cart or update state
-  };
-
-  const handleRemoveItem = (itemId: string) => {
-    // TODO: Implement API call to remove item
-    console.log(`Remove item ${itemId}`);
-    // After successful API call, refetch cart or update state
-  };
-
-  const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+  const totalAmount = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  if (isLoading) {
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-center">
-          <Loader2 className="mr-2 h-8 w-8 animate-spin" /> Загрузка корзины...
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-destructive">Ошибка: {error}</div>
-      </main>
-    );
-  }
-
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
       <main className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Ваша корзина пуста</h1>
@@ -101,33 +44,33 @@ export default function CartPage() {
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Ваша корзина</h1>
       <div className="grid gap-6">
-        {cartItems.map((item) => (
-          <div key={item.id} className="flex items-center border-b pb-4">
+        {cart.map((item) => (
+          <div key={item.productId} className="flex items-center border-b pb-4">
             <div className="flex-shrink-0 mr-4">
-              {/* Placeholder for the image */}
+              <img src={item.image} alt={item.name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
             </div>
             <div className="flex-grow">
               <Link href={`/products/${item.productId}`} className="text-lg font-semibold hover:underline">
-                {item.product.name}
+                {item.name}
               </Link>
-              {(item.size || item.color) && (
-                <p className="text-sm text-muted-foreground">
-                  {item.size && `Размер: ${item.size}`}
-                  {item.size && item.color && ', '}
-                  {item.color && `Цвет: ${item.color}`}
-                </p>
-              )}
-              <p className="text-foreground">{item.product.price} ₽</p>
+              <p className="text-foreground">{item.price} ₽</p>
             </div>
             <div className="flex items-center">
               <input
                 type="number"
                 min="1"
                 value={item.quantity}
-                onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value))}
+                onChange={(e) => {
+                  const qty = parseInt(e.target.value);
+                  if (qty > 0) {
+                    removeFromCart(item.productId);
+                    // addToCart с новым количеством
+                    // (можно реализовать через useCart, если нужно)
+                  }
+                }}
                 className="w-16 border rounded-md text-center mr-4"
               />
-              <Button variant="outline" size="sm" onClick={() => handleRemoveItem(item.id)}>
+              <Button variant="outline" size="sm" onClick={() => removeFromCart(item.productId)}>
                 Удалить
               </Button>
             </div>
@@ -137,8 +80,7 @@ export default function CartPage() {
 
       <div className="mt-6 text-right">
         <h2 className="text-xl font-bold">Итого: {totalAmount} ₽</h2>
-        {/* TODO: Add checkout button */}
-        <Button className="mt-4">Перейти к оформлению</Button>
+        <Button className="mt-4" onClick={clearCart}>Очистить корзину</Button>
       </div>
     </main>
   );

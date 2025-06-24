@@ -9,6 +9,7 @@ import { ProductImageSlider } from './ProductImageSlider';
 import { useSession } from 'next-auth/react';
 import type React from 'react';
 import type { JSX } from 'react';
+import { useCart } from '@/hooks/useCart';
 
 interface ProductCardProps {
   id: string;
@@ -49,45 +50,25 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { data: session } = useSession();
+  const { addToCart } = useCart();
 
-  const addToCart = async (e: React.MouseEvent) => {
+  const addToCartHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!session || !session.user) {
-      alert('Чтобы добавить товар в корзину, войдите в аккаунт.');
-      return;
-    }
-
-    try {
-      const accessToken = (session as any).accessToken;
-      const res = await fetch('/api/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-        },
-        body: JSON.stringify({
-        productId: id,
-        quantity: 1,
-        size: Array.isArray(size) && size.length > 0 ? size[0] : null,
-        color: Array.isArray(colors) && colors.length > 0 ? colors[0] : null,
-        })
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Ошибка при добавлении в корзину');
-      }
-      // Визуальный отклик
-      const button = e.currentTarget as HTMLButtonElement;
-      if (button && button.classList) {
-        button.classList.add('bg-green-500');
-        setTimeout(() => {
-          button.classList.remove('bg-green-500');
-        }, 1000);
-      }
-    } catch (error: any) {
-      alert(error.message || 'Не удалось добавить товар в корзину');
+    addToCart({
+      productId: Number(id),
+      name,
+      price,
+      image: images && images[0] ? images[0].url : '',
+      quantity: 1,
+    });
+    // Визуальный отклик
+    const button = e.currentTarget as HTMLButtonElement;
+    if (button && button.classList) {
+      button.classList.add('bg-green-500');
+      setTimeout(() => {
+        button.classList.remove('bg-green-500');
+      }, 1000);
     }
   };
 
@@ -150,7 +131,7 @@ export default function ProductCard({
                 className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 px-3"
               >
                 <button
-                  onClick={addToCart}
+                  onClick={addToCartHandler}
                   className="bg-card hover:bg-muted text-foreground p-2 rounded-full shadow-lg transform hover:scale-110 transition-all duration-200"
                   aria-label="Добавить в корзину"
                 >
