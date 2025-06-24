@@ -14,15 +14,43 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     const productId = params.id;
 
-    // Получаем товар из базы данных
-    const result = await query(`
-      SELECT 
-        p.*,
-        u.name as seller_name
-      FROM products p
-      LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
-      WHERE p.id = $1
-    `, [productId]);
+    // Получаем товар из базы данных, с изображениями если таблица существует
+    let result;
+    let hasImageTable = true;
+    
+    try {
+      // Пробуем запрос с изображениями
+      await query('SELECT 1 FROM "ProductImage" LIMIT 1');
+      
+      result = await query(`
+        SELECT 
+          p.*,
+          u.name as seller_name,
+          COALESCE(
+            json_agg(
+              json_build_object('url', pi.url, 'alt', COALESCE(pi.alt_text, p.name))
+            ) FILTER (WHERE pi.id IS NOT NULL), 
+            '[]'
+          ) AS images
+        FROM products p
+        LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
+        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        WHERE p.id = $1
+        GROUP BY p.id, u.name
+      `, [productId]);
+    } catch (error) {
+      console.log('ProductImage table not found, using simple query for product', productId);
+      hasImageTable = false;
+      
+      result = await query(`
+        SELECT 
+          p.*,
+          u.name as seller_name
+        FROM products p
+        LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
+        WHERE p.id = $1
+      `, [productId]);
+    }
 
     if (result.rows.length === 0) {
       return NextResponse.json({ error: 'Товар не найден' }, { status: 404 });
@@ -41,7 +69,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       colors: ['Красный', 'Синий', 'Зеленый'], // Статические цвета пока
       stock: product.stock,
       rating: Math.floor(Math.random() * 1.5 + 3.5 * 10) / 10, // Случайный рейтинг от 3.5 до 5
-      images: product.image ? [{ url: product.image, alt: product.name }] : [],
+      images: product.images || (product.image ? [{ url: product.image, alt: product.name }] : []),
       seller: {
         name: product.seller_name || 'Неизвестный продавец',
       },

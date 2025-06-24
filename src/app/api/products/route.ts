@@ -30,9 +30,34 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '0');
 
     // Build SQL query conditions
-    let queryStr = 'SELECT * FROM products WHERE 1=1';
     const params: (string | number)[] = [];
     let paramIndex = 1;
+    let queryStr = '';
+    let hasImageTable = true;
+    
+    // Try to use image table first, fallback to simple query
+    try {
+      // Check if ProductImage table exists by trying a simple query
+      await query('SELECT 1 FROM "ProductImage" LIMIT 1');
+      
+      queryStr = `
+        SELECT 
+          p.*,
+          COALESCE(
+            json_agg(
+              json_build_object('url', pi.url, 'alt', COALESCE(pi.alt_text, p.name))
+            ) FILTER (WHERE pi.id IS NOT NULL), 
+            '[]'
+          ) AS images
+        FROM products p
+        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        WHERE 1=1
+      `;
+    } catch (error) {
+      console.log('ProductImage table not found, using simple query');
+      hasImageTable = false;
+      queryStr = 'SELECT * FROM products WHERE 1=1';
+    }
 
     // Note: category filtering is disabled since current schema doesn't have category field
     // if (category) {
@@ -51,8 +76,13 @@ export async function GET(request: Request) {
     const totalResult = await query(countQuery, params);
     const total = parseInt(totalResult.rows[0].total, 10);
 
-    // Add ordering and limit
-    queryStr += ' ORDER BY created_at DESC';
+    // Add GROUP BY (only if using image table), ordering and limit
+    if (hasImageTable) {
+      queryStr += ' GROUP BY p.id ORDER BY p.created_at DESC';
+    } else {
+      queryStr += ' ORDER BY created_at DESC';
+    }
+    
     if (limit > 0) {
       queryStr += ` LIMIT $${paramIndex}`;
       params.push(limit);
@@ -76,7 +106,7 @@ export async function GET(request: Request) {
         id: product.seller_id || product.sellerId || '',
         name: 'Неизвестный продавец', // В простой схеме нет join с User
       },
-      images: product.image ? [{ url: product.image, alt: product.name }] : [],
+      images: product.images || (product.image ? [{ url: product.image, alt: product.name }] : []),
       specifications: {}, // В простой схеме нет поля specifications
       createdAt: product.created_at || product.createdAt,
       updatedAt: product.updated_at || product.updatedAt,
