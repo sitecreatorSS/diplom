@@ -1,6 +1,9 @@
 # Используем официальный образ Node.js
 FROM node:18-alpine AS base
 
+# Устанавливаем лимит памяти для Node.js
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
 # Устанавливаем зависимости, необходимые для работы с PostgreSQL и другими библиотеками
 RUN apk add --no-cache libc6-compat
 
@@ -15,7 +18,7 @@ COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
 # Устанавливаем зависимости
-RUN npm ci
+RUN npm ci --no-audit
 
 # Копируем исходный код
 COPY . .
@@ -35,7 +38,7 @@ COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
 # Устанавливаем только production зависимости
-RUN npm ci --only=production
+RUN npm ci --only=production --no-audit
 
 # Копируем собранное приложение из предыдущего этапа
 COPY --from=base /app/.next ./.next
