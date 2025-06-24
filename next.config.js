@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -12,4 +13,6 @@ module.exports = {
       // Добавь другие домены, если используешь их для картинок
     ],
   },
-}; 
+};
+
+export default nextConfig; 

@@ -115,7 +115,7 @@ export default function SellerPanelPage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {products.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground">
-            You haven't added any products yet.
+            You haven&apos;t added any products yet.
           </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">

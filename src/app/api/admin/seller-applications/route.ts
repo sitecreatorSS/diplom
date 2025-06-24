@@ -2,9 +2,10 @@ import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { query } from '@/lib/db';
+import { User } from '@/types/database';
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as { user?: User };
 
   // Проверяем, аутентифицирован ли пользователь и является ли он администратором
   if (!session?.user || session.user.role !== 'ADMIN') {
@@ -50,7 +51,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as { user?: User };
 
   // Проверяем, аутентифицирован ли пользователь и является ли он администратором
   if (!session || session.user.role !== 'ADMIN') {
