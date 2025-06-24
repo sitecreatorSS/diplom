@@ -9,7 +9,7 @@ import { ProductImageSlider } from './ProductImageSlider';
 import { useSession } from 'next-auth/react';
 import type React from 'react';
 import type { JSX } from 'react';
-import { useCart } from '@/hooks/useCart';
+import { useCartContext } from '@/context/CartContext';
 
 interface ProductCardProps {
   id: string;
@@ -50,7 +50,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { data: session } = useSession();
-  const { addToCart } = useCart();
+  const { addToCart } = useCartContext();
 
   const addToCartHandler = (e: React.MouseEvent) => {
     e.preventDefault();

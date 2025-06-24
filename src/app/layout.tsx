@@ -7,6 +7,7 @@ import { Providers } from "@/app/providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CustomSession } from "./providers";
+import { CartProvider } from '@/context/CartContext';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,11 +31,13 @@ export default async function RootLayout({
     <html lang="ru" className={inter.variable}>
       <body className="font-sans antialiased min-h-screen flex flex-col bg-white">
         <Providers session={session}>
-          <Navbar />
-          <main className="flex-grow bg-white">
-            {children}
-          </main>
-          <Footer />
+          <CartProvider>
+            <Navbar />
+            <main className="flex-grow bg-white">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
         </Providers>
       </body>
     </html>

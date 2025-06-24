@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { useCartContext } from '@/context/CartContext';
 
 interface CartItem {
   id: string;
@@ -21,7 +21,7 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart } = useCartContext();
 
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
