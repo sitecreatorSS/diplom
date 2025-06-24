@@ -58,47 +58,43 @@ export async function GET(request: Request) {
     }
 
     // Get products
-    const result = await query(queryStr, params);
+    const result = await query(`
+      SELECT 
+        p.*,
+        COALESCE(
+          json_agg(
+            json_build_object('url', pi.url, 'alt', p.name)
+          ) FILTER (WHERE pi.id IS NOT NULL), 
+          '[]'
+        ) AS images
+      FROM products p
+      LEFT JOIN product_images pi ON p.id = pi.product_id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `);
     const products = result.rows;
 
     // Transform products
-    const transformedProducts = await Promise.all(products.map(async (product: any) => {
-      // Get seller info
-      const seller = await findUserById(product.sellerId);
-      
-      // Get product images (assuming we have an images table)
-      // TODO: Implement image repository
-      const images = [];
-      if (product.image) {
-        images.push({
-          id: product.id,
-          url: product.image,
-          alt: product.name,
-        });
-      }
-
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        category: product.category,
-        stock: product.stock,
-        rating: generateRandomRating(),
-        reviewCount: Math.floor(Math.random() * 100) + 1, // Random review count for demo
-        seller: {
-          id: seller?.id || '',
-          name: seller?.name || 'Unknown Seller',
-        },
-        images,
-        image: product.image || '/placeholder-product.jpg',
-        specifications: tryParseJson<Record<string, string>>(
-          product.specifications,
-          {}
-        ),
-        createdAt: product.created_at,
-        updatedAt: product.updated_at,
-      };
+    const transformedProducts = products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      stock: product.stock,
+      rating: generateRandomRating(),
+      reviewCount: Math.floor(Math.random() * 100) + 1,
+      seller: {
+        id: product.seller_id || '',
+        name: product.seller_name || 'Unknown Seller',
+      },
+      images: product.images || [],
+      specifications: tryParseJson<Record<string, string>>(
+        product.specifications,
+        {}
+      ),
+      createdAt: product.created_at,
+      updatedAt: product.updated_at,
     }));
 
     return NextResponse.json({
