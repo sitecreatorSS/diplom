@@ -12,7 +12,15 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
   const { cart, updateQuantity, removeFromCart } = useCartContext();
 
   const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart.reduce((total, item) => {
+      const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+      // Дополнительная проверка на NaN
+      if (isNaN(price)) {
+        console.warn('Некорректная цена товара:', item);
+        return total;
+      }
+      return total + (price * item.quantity);
+    }, 0);
   };
 
   return (
@@ -46,7 +54,10 @@ export default function CartWidget({ onClose }: CartWidgetProps) {
                   <div className="flex-1">
                     <h3 className="font-medium text-foreground">{item.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {item.price.toFixed(2)} ₽
+                      {(() => {
+                        const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
+                        return isNaN(price) ? '0.00' : price.toFixed(2);
+                      })()} ₽
                     </p>
                     {(item.size || item.color) && (
                       <p className="text-sm text-muted-foreground">

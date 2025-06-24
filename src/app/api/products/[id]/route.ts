@@ -14,24 +14,37 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     const productId = params.id;
 
-    // Replace this with your actual SQL query to fetch the product
-    const product = {
-      id: productId,
-      name: 'Sample Product',
-      price: 100,
-      sizes: '["Small", "Medium", "Large"]',
-      colors: '["Red", "Blue", "Green"]',
-    };
+    // Получаем товар из базы данных
+    const result = await query(`
+      SELECT 
+        p.*,
+        u.name as seller_name
+      FROM products p
+      LEFT JOIN "User" u ON p."sellerId" = u.id
+      WHERE p.id = $1
+    `, [productId]);
 
-    if (!product) {
+    if (result.rows.length === 0) {
       return NextResponse.json({ error: 'Товар не найден' }, { status: 404 });
     }
 
-    // Parse JSON fields for sizes and colors and ensure correct type
-    const productWithParsedFields: ProductWithDetails = {
-      ...product,
-      sizes: JSON.parse(product.sizes),
-      colors: JSON.parse(product.colors),
+    const product = result.rows[0];
+
+    // Приводим цену к числу и парсим JSON поля
+    const productWithParsedFields = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+      category: 'Общее', // Пока используем статическую категорию, так как в простой схеме нет поля category
+      sizes: ['S', 'M', 'L', 'XL'], // Статические размеры пока
+      colors: ['Красный', 'Синий', 'Зеленый'], // Статические цвета пока
+      stock: product.stock,
+      rating: Math.floor(Math.random() * 1.5 + 3.5 * 10) / 10, // Случайный рейтинг от 3.5 до 5
+      images: product.image ? [{ url: product.image, alt: product.name }] : [],
+      seller: {
+        name: product.seller_name || 'Неизвестный продавец',
+      },
     };
 
     return NextResponse.json(productWithParsedFields);

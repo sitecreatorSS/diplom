@@ -16,12 +16,46 @@ export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(CART_KEY);
-    if (stored) setCart(JSON.parse(stored));
+    try {
+      const stored = localStorage.getItem(CART_KEY);
+      if (stored) {
+        const parsedCart = JSON.parse(stored);
+        // Проверяем что данные валидны
+        if (Array.isArray(parsedCart)) {
+          // Фильтруем и валидируем каждый элемент корзины
+          const validCartItems = parsedCart
+            .filter(item => 
+              item && 
+              typeof item === 'object' &&
+              typeof item.productId === 'string' &&
+              typeof item.name === 'string' &&
+              (typeof item.price === 'number' || typeof item.price === 'string') &&
+              typeof item.imageUrl === 'string' &&
+              typeof item.quantity === 'number' &&
+              item.quantity > 0
+            )
+            .map(item => ({
+              ...item,
+              // Убеждаемся, что price всегда число
+              price: typeof item.price === 'string' ? parseFloat(item.price) : item.price
+            }))
+            .filter(item => !isNaN(item.price)); // Исключаем элементы с некорректной ценой
+          setCart(validCartItems);
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке корзины из localStorage:', error);
+      // Очищаем поврежденные данные
+      localStorage.removeItem(CART_KEY);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch (error) {
+      console.error('Ошибка при сохранении корзины в localStorage:', error);
+    }
   }, [cart]);
 
   function addToCart(item: CartItem) {

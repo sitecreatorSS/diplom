@@ -8,7 +8,17 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCartContext();
 
   const totalAmount = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => {
+      // Безопасное преобразование цены
+      let price = 0;
+      if (typeof item.price === 'string') {
+        const parsed = parseFloat(item.price);
+        price = isNaN(parsed) ? 0 : parsed;
+      } else if (typeof item.price === 'number') {
+        price = isNaN(item.price) ? 0 : item.price;
+      }
+      return sum + (price * (item.quantity || 0));
+    },
     0
   );
 

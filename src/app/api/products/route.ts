@@ -34,10 +34,11 @@ export async function GET(request: Request) {
     const params: (string | number)[] = [];
     let paramIndex = 1;
 
-    if (category) {
-      queryStr += ` AND "category" = $${paramIndex++}`;
-      params.push(category);
-    }
+    // Note: category filtering is disabled since current schema doesn't have category field
+    // if (category) {
+    //   queryStr += ` AND "category" = $${paramIndex++}`;
+    //   params.push(category);
+    // }
 
     if (search) {
       queryStr += ` AND ("name" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`;
@@ -51,27 +52,14 @@ export async function GET(request: Request) {
     const total = parseInt(totalResult.rows[0].total, 10);
 
     // Add ordering and limit
-    queryStr += ' ORDER BY "created_at" DESC';
+    queryStr += ' ORDER BY "createdAt" DESC';
     if (limit > 0) {
       queryStr += ` LIMIT $${paramIndex}`;
       params.push(limit);
     }
 
     // Get products
-    const result = await query(`
-      SELECT 
-        p.*,
-        COALESCE(
-          json_agg(
-            json_build_object('url', pi.url, 'alt', p.name)
-          ) FILTER (WHERE pi.id IS NOT NULL), 
-          '[]'
-        ) AS images
-      FROM products p
-      LEFT JOIN product_images pi ON p.id = pi.product_id
-      GROUP BY p.id
-      ORDER BY p.created_at DESC
-    `);
+    const result = await query(queryStr, params);
     const products = result.rows;
 
     // Transform products
@@ -79,22 +67,19 @@ export async function GET(request: Request) {
       id: product.id,
       name: product.name,
       description: product.description,
-      price: product.price,
-      category: product.category,
+      price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
+      category: 'Общее', // Статическая категория, так как в простой схеме нет поля category
       stock: product.stock,
       rating: generateRandomRating(),
       reviewCount: Math.floor(Math.random() * 100) + 1,
       seller: {
-        id: product.seller_id || '',
-        name: product.seller_name || 'Unknown Seller',
+        id: product.sellerId || '',
+        name: 'Неизвестный продавец', // В простой схеме нет join с User
       },
-      images: product.images || [],
-      specifications: tryParseJson<Record<string, string>>(
-        product.specifications,
-        {}
-      ),
-      createdAt: product.created_at,
-      updatedAt: product.updated_at,
+      images: product.image ? [{ url: product.image, alt: product.name }] : [],
+      specifications: {}, // В простой схеме нет поля specifications
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
     }));
 
     return NextResponse.json({
