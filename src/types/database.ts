@@ -50,6 +50,8 @@ export interface CartItem extends BaseEntity {
   productId: string;
   quantity: number;
   priceAtAddition: number;
+  size?: string | null;
+  color?: string | null;
 }
 
 export type OrderStatus = 

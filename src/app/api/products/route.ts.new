@@ -60,11 +60,12 @@ export async function GET(request: Request) {
       SELECT 
         p.*, 
         u.name as seller_name,
-        (
-          SELECT json_agg(json_build_object('url', pi.url, 'alt', p.name))
-          FROM product_images pi
-          WHERE pi.product_id = p.id
-        ) as images
+        COALESCE(
+          json_agg(
+            json_build_object('url', pi.url, 'alt', p.name)
+          ) FILTER (WHERE pi.id IS NOT NULL), 
+          '[]'
+        ) AS images
       ${baseQuery}
       ${whereStr}
       GROUP BY p.id, u.id

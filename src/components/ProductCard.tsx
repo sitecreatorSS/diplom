@@ -80,10 +80,12 @@ export default function ProductCard({
       }
       // Визуальный отклик
       const button = e.currentTarget as HTMLButtonElement;
-      button.classList.add('bg-green-500');
-      setTimeout(() => {
-        button.classList.remove('bg-green-500');
-      }, 1000);
+      if (button && button.classList) {
+        button.classList.add('bg-green-500');
+        setTimeout(() => {
+          button.classList.remove('bg-green-500');
+        }, 1000);
+      }
     } catch (error: any) {
       alert(error.message || 'Не удалось добавить товар в корзину');
     }
