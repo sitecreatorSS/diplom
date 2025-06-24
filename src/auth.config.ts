@@ -2,17 +2,9 @@ import type { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 // import { PrismaClient } from "@prisma/client"; // Удалено
 import bcrypt from 'bcryptjs';
-import { pool } from './lib/db'; // Импорт пула соединений pg
+import { query } from "./lib/db";
 
 // const prisma = new PrismaClient(); // Удалено
-
-interface AuthUser extends User {
-  id: string;
-  name?: string | null;
-  email?: string | null;
-  role: 'ADMIN' | 'SELLER' | 'BUYER';
-  [key: string]: any; // Добавляем индексную сигнатуру
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -22,38 +14,52 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials): Promise<AuthUser | null> {
+      async authorize(credentials): Promise<User | null> {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Неверные учетные данные');
+          console.log('Authorize: Missing credentials');
+          return null;
         }
 
-        // Пример замены:
-        // Вместо prisma.user.findUnique({ where: { email } }) используйте обычный SQL-запрос через pg
-        // const result = await pool.query('SELECT * FROM users WHERE email = $1', [credentials.email]);
-        // const user = result.rows[0];
-        // if (!user) throw new Error('Пользователь не найден');
-        // const isCorrectPassword = await bcrypt.compare(credentials.password as string, user.password);
-        // if (!isCorrectPassword) throw new Error('Неверный пароль');
-        // return { id: user.id, name: user.name, email: user.email, role: user.role };
+        try {
+          const result = await query('SELECT * FROM users WHERE email = $1', [credentials.email]);
+          const user = result.rows[0];
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role as 'ADMIN' | 'SELLER' | 'BUYER',
-        } as AuthUser;
+          if (!user) {
+            console.log(`Authorize: User not found for email: ${credentials.email}`);
+            return null;
+          }
+
+          const isCorrectPassword = await bcrypt.compare(credentials.password, user.password);
+
+          if (!isCorrectPassword) {
+            console.log(`Authorize: Incorrect password for email: ${credentials.email}`);
+            return null;
+          }
+          
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch (e) {
+          console.error("Authorize error:", e);
+          return null;
+        }
       }
     })
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id;
         session.user.role = token.role;
       }
       return session;

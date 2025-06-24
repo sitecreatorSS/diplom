@@ -3,7 +3,7 @@
 import { Session } from "next-auth";
 import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
 
-interface CustomSession extends Session {
+export interface CustomSession extends Session {
   user: {
     id: string;
     name?: string | null;
@@ -11,6 +11,7 @@ interface CustomSession extends Session {
     image?: string | null;
     role: 'ADMIN' | 'SELLER' | 'BUYER';
   };
+  expires: string;
 }
 
 export function Providers({

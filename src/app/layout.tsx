@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { Providers } from "@/app/providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Session } from 'next-auth';
+import { CustomSession } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +24,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = (await getServerSession(authOptions)) as Session | null;
+  const session = (await getServerSession(authOptions)) as CustomSession | null;
 
   return (
     <html lang="ru" className={inter.variable}>

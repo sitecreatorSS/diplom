@@ -53,7 +53,7 @@ export async function updateCartItem(userId: string, itemId: string, quantity: n
 
 export async function removeFromCart(userId: string, itemId: string): Promise<boolean> {
   const result = await query('DELETE FROM "CartItem" WHERE id = $1 AND "userId" = $2 RETURNING id', [itemId, userId]);
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function clearCart(userId: string): Promise<void> {

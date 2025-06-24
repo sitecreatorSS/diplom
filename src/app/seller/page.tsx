@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { CustomSession } from '@/app/providers';
 
 interface ProductData {
   id: string;
@@ -17,7 +18,7 @@ interface ProductData {
 }
 
 export default function SellerPanelPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as { data: CustomSession | null, status: string };
   const router = useRouter();
   const [products, setProducts] = useState<ProductData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +28,7 @@ export default function SellerPanelPage() {
     if (status === 'loading') return; // Wait for session to load
 
     // Redirect if user is not logged in or not a seller
-    if (!session || session.user.role !== 'SELLER') {
+    if (status === 'unauthenticated' || (status === 'authenticated' && session?.user?.role !== 'SELLER')) {
       router.push('/'); // Redirect to home or login page
       return;
     }

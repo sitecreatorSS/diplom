@@ -154,12 +154,4 @@ async function seed() {
   }
 }
 
-// Если файл запущен напрямую, а не импортирован
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seed().catch(error => {
-    console.error('Unhandled error during seeding:', error);
-    process.exit(1);
-  });
-}
-
 export { seed };

@@ -149,15 +149,14 @@ export async function mergeGuestWishlist(
     return { added: 0, skipped: 0 };
   }
 
-  // Remove duplicates and existing items
+  console.log(`Adding products to wishlist for user ${userId}:`, guestWishlist);
   const uniqueProductIds = [...new Set(guestWishlist)];
-  
-  // Check which items already exist in user's wishlist
+
   const existingItems = await query(
-    'SELECT "productId" FROM "WishlistItem" WHERE "userId" = $1 AND "productId" = ANY($2::text[])'
+    'SELECT "productId" FROM "WishlistItem" WHERE "userId" = $1 AND "productId" = ANY($2::text[])',
     [userId, uniqueProductIds]
   );
-  
+
   const existingProductIds = existingItems.rows.map(item => item.productId);
   const newProductIds = uniqueProductIds.filter(id => !existingProductIds.includes(id));
   

@@ -14,7 +14,7 @@ interface MigrationError extends Error {
   position?: string;
 }
 
-async function migrate() {
+export async function migrate() {
   console.log('Starting database migration...\n');
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -141,9 +141,3 @@ async function migrate() {
     await pool.end();
   }
 }
-
-// Запускаем миграцию
-migrate().catch(error => {
-  console.error('Migration script failed:', error, '\n');
-  process.exit(1);
-});
