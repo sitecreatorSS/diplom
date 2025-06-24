@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     // }
 
     if (search) {
-      queryStr += ` AND ("name" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`;
+      queryStr += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
       params.push(`%${search}%`);
       paramIndex++;
     }
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     const total = parseInt(totalResult.rows[0].total, 10);
 
     // Add ordering and limit
-    queryStr += ' ORDER BY "createdAt" DESC';
+    queryStr += ' ORDER BY created_at DESC';
     if (limit > 0) {
       queryStr += ` LIMIT $${paramIndex}`;
       params.push(limit);
@@ -73,13 +73,13 @@ export async function GET(request: Request) {
       rating: generateRandomRating(),
       reviewCount: Math.floor(Math.random() * 100) + 1,
       seller: {
-        id: product.sellerId || '',
+        id: product.seller_id || product.sellerId || '',
         name: 'Неизвестный продавец', // В простой схеме нет join с User
       },
       images: product.image ? [{ url: product.image, alt: product.name }] : [],
       specifications: {}, // В простой схеме нет поля specifications
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt,
+      createdAt: product.created_at || product.createdAt,
+      updatedAt: product.updated_at || product.updatedAt,
     }));
 
     return NextResponse.json({

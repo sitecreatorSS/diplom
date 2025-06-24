@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         p.*,
         u.name as seller_name
       FROM products p
-      LEFT JOIN "User" u ON p."sellerId" = u.id
+      LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
       WHERE p.id = $1
     `, [productId]);
 
