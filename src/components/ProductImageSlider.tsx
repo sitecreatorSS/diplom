@@ -72,7 +72,7 @@ export function ProductImageSlider({ images, className = '' }: ProductImageSlide
           className="w-full h-full"
         >
           <Image
-            src={`${process.env.NEXT_PUBLIC_BASE_URL || ''}${images[currentImageIndex].url}`}
+            src={images[currentImageIndex].url}
             alt={images[currentImageIndex].alt || 'Изображение товара'}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

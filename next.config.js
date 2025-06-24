@@ -6,15 +6,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'raw.githubusercontent.com',
       },
-      {
-        protocol: 'https',
-        hostname: 'githubusercontent.com',
-      },
+      // Если используешь другие внешние источники картинок, добавь их сюда
       {
         protocol: 'https',
         hostname: 'shop5-production.up.railway.app',
       },
-      // Добавь другие домены, если используешь их для картинок
     ],
   },
 };
