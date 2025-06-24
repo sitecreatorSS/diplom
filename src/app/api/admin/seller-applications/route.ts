@@ -54,7 +54,7 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions) as { user?: User };
 
   // Проверяем, аутентифицирован ли пользователь и является ли он администратором
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'ADMIN') {
     return NextResponse.json({ message: 'Неавторизованный доступ' }, { status: 401 });
   }
 
