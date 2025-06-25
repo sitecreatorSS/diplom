@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
     // Add GROUP BY (only if using image table), ordering and limit
     if (hasImageTable) {
-      queryStr += ' GROUP BY p.id ORDER BY p.id DESC';
+      queryStr += ' GROUP BY p.id, p.name, p.description, p.price, p.seller_id, p.created_at, p.updated_at ORDER BY p.created_at DESC';
     } else {
       queryStr += ' ORDER BY id DESC';
     }
