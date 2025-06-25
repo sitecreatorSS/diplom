@@ -80,7 +80,33 @@ export async function GET(request: Request) {
 
     // Get products
     const result = await query(queryStr, params);
-    const products = result.rows;
+    let products = result.rows;
+    
+    // Если есть таблица изображений, получаем изображения для каждого товара
+    if (hasImageTable && products.length > 0) {
+      const productIds = products.map(p => p.id);
+      const placeholders = productIds.map((_, index) => `$${index + 1}`).join(',');
+      
+      const imagesResult = await query(
+        `SELECT product_id, url FROM product_images WHERE product_id IN (${placeholders})`,
+        productIds
+      );
+      
+      // Группируем изображения по product_id
+      const imagesByProductId = imagesResult.rows.reduce((acc, img) => {
+        if (!acc[img.product_id]) {
+          acc[img.product_id] = [];
+        }
+        acc[img.product_id].push({ url: img.url, alt: '' });
+        return acc;
+      }, {});
+      
+      // Добавляем изображения к продуктам
+      products = products.map(product => ({
+        ...product,
+        images: imagesByProductId[product.id] || []
+      }));
+    }
     
     console.log('Query executed:', queryStr);
     console.log('Has image table:', hasImageTable);

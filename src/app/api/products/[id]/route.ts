@@ -48,7 +48,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: 'Товар не найден' }, { status: 404 });
     }
 
-    const product = result.rows[0];
+    let product = result.rows[0];
+    
+    // Получаем изображения для продукта, если таблица существует
+    if (hasImageTable) {
+      try {
+        const imagesResult = await query(
+          'SELECT url FROM product_images WHERE product_id = $1',
+          [productId]
+        );
+        product.images = imagesResult.rows.map(img => ({ url: img.url, alt: product.name }));
+      } catch (error) {
+        console.log('Error fetching images for product:', error);
+        product.images = [];
+      }
+    }
 
     // Приводим цену к числу и парсим JSON поля
     const productWithParsedFields = {
