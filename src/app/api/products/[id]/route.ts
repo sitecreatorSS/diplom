@@ -24,10 +24,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
       
       result = await query(`
         SELECT 
-          p.id, p.name, p.description, p.price, p.seller_id, p.created_at, p.updated_at,
-          u.name as seller_name
+          p.id, p.name, p.description, p.price, p.seller_id, p.created_at, p.updated_at
         FROM products p
-        LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
         WHERE p.id = $1
       `, [productId]);
     } catch (error) {
@@ -36,10 +34,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
       
       result = await query(`
         SELECT 
-          p.*,
-          u.name as seller_name
+          p.*
         FROM products p
-        LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
         WHERE p.id = $1
       `, [productId]);
     }
@@ -78,7 +74,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       rating: Math.floor(Math.random() * 1.5 + 3.5 * 10) / 10, // Случайный рейтинг от 3.5 до 5
       images: images.length > 0 ? images : (product.image ? [{ url: product.image, alt: product.name }] : []),
       seller: {
-        name: product.seller_name || 'Неизвестный продавец',
+        name: 'Неизвестный продавец', // Пока нет таблицы User в облачной БД
       },
     };
 
