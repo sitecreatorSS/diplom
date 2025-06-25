@@ -48,19 +48,20 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: 'Товар не найден' }, { status: 404 });
     }
 
-    let product = result.rows[0];
+    const product = result.rows[0];
     
     // Получаем изображения для продукта, если таблица существует
+    let images: { url: string; alt: string }[] = [];
     if (hasImageTable) {
       try {
         const imagesResult = await query(
           'SELECT url FROM product_images WHERE product_id = $1',
           [productId]
         );
-        product.images = imagesResult.rows.map(img => ({ url: img.url, alt: product.name }));
+        images = imagesResult.rows.map(img => ({ url: img.url, alt: product.name }));
       } catch (error) {
         console.log('Error fetching images for product:', error);
-        product.images = [];
+        images = [];
       }
     }
 
@@ -75,7 +76,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       colors: ['Красный', 'Синий', 'Зеленый'], // Статические цвета пока
       stock: Math.floor(Math.random() * 50) + 1, // Статический stock пока
       rating: Math.floor(Math.random() * 1.5 + 3.5 * 10) / 10, // Случайный рейтинг от 3.5 до 5
-      images: product.images || (product.image ? [{ url: product.image, alt: product.name }] : []),
+      images: images.length > 0 ? images : (product.image ? [{ url: product.image, alt: product.name }] : []),
       seller: {
         name: product.seller_name || 'Неизвестный продавец',
       },
