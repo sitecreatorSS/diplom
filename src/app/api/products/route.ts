@@ -41,16 +41,9 @@ export async function GET(request: Request) {
       await query('SELECT 1 FROM product_images LIMIT 1');
       
       queryStr = `
-        SELECT 
-          p.*,
-          COALESCE(
-            json_agg(
-              json_build_object('url', pi.url, 'alt', p.name)
-            ) FILTER (WHERE pi.id IS NOT NULL), 
-            '[]'
-          ) AS images
+        SELECT DISTINCT
+          p.id, p.name, p.description, p.price, p.seller_id, p.created_at, p.updated_at
         FROM products p
-        LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE 1=1
       `;
     } catch (error) {
@@ -76,12 +69,9 @@ export async function GET(request: Request) {
     const totalResult = await query(countQuery, params);
     const total = parseInt(totalResult.rows[0].total, 10);
 
-    // Add GROUP BY (only if using image table), ordering and limit
-    if (hasImageTable) {
-      queryStr += ' GROUP BY p.id, p.name, p.description, p.price, p.seller_id, p.created_at, p.updated_at ORDER BY p.created_at DESC';
-    } else {
-      queryStr += ' ORDER BY id DESC';
-    }
+    // Add ordering and limit
+    queryStr += ' ORDER BY created_at DESC';
+    
     
     if (limit > 0) {
       queryStr += ` LIMIT $${paramIndex}`;
