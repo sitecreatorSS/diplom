@@ -1,21 +1,23 @@
 import { NextResponse } from 'next/server';
 import { UserRole, Product } from '@/types/database';
-import { verifyToken } from '@/lib/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { User } from '@/types/database';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1];
-    if (!token) {
+    // Проверяем сессию пользователя
+    const session = await getServerSession(authOptions) as { user?: User };
+    
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Требуется авторизация' },
         { status: 401 }
       );
     }
 
-    const { role } = verifyToken(token);
-
-    if (role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Недостаточно прав' },
         { status: 403 }

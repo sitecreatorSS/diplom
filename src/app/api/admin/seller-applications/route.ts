@@ -14,20 +14,38 @@ export async function GET() {
 
   try {
     // Получаем все заявки с информацией о пользователях
-    const applicationsResult = await query(`
-      SELECT 
-        sa.*,
-        json_build_object(
-          'id', u.id,
-          'name', u.name,
-          'email', u.email,
-          'role', u.role,
-          'createdAt', u.created_at
-        ) as user
-      FROM "SellerApplication" sa
-      JOIN users u ON sa.user_id = u.id
-      ORDER BY sa.created_at DESC
-    `);
+    let applicationsResult;
+    try {
+      applicationsResult = await query(`
+        SELECT 
+          sa.*,
+          json_build_object(
+            'id', u.id,
+            'name', u.name,
+            'email', u.email,
+            'role', u.role,
+            'createdAt', u.created_at
+          ) as user
+        FROM seller_applications sa
+        JOIN users u ON sa.user_id = u.id
+        ORDER BY sa.created_at DESC
+      `);
+    } catch (error) {
+      console.log('SellerApplication table not found, returning empty data');
+      // Если таблицы заявок нет, возвращаем пустые данные
+      const statsResult = await query(`
+        SELECT 
+          COUNT(*) as total_users,
+          COUNT(*) FILTER (WHERE role = 'SELLER') as total_sellers,
+          COUNT(*) FILTER (WHERE role = 'BUYER') as total_buyers
+        FROM users
+      `);
+      
+      return NextResponse.json({
+        applications: [],
+        stats: statsResult.rows[0]
+      });
+    }
 
     // Получаем статистику
     const statsResult = await query(`

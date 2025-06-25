@@ -58,11 +58,7 @@ export default function ProductsAdminPage() {
         return;
       }
       
-      const response = await fetch('/api/admin/products', {
-        headers: {
-          'Authorization': `Bearer ${(session as any)?.accessToken || ''}`,
-        },
-      });
+      const response = await fetch('/api/admin/products');
       
       if (!response.ok) {
         if (response.status === 401) {
