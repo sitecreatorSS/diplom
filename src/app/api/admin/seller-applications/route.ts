@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       // Получаем заявку и пользователя
       const applicationResult = await query(
         `SELECT sa.*, u.id as user_id, u.role as user_role
-         FROM "SellerApplication" sa
+         FROM seller_applications sa
          JOIN users u ON sa.user_id = u.id
          WHERE sa.id = $1`,
         [applicationId]
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
 
       // Обновляем статус заявки
       const updatedApplicationResult = await query(
-        `UPDATE "SellerApplication"
+        `UPDATE seller_applications
          SET 
            status = $1,
            review_notes = $2,
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
       // Если заявка одобрена, обновляем роль пользователя
       if (status === 'APPROVED') {
         await query(
-          `UPDATE "User"
+          `UPDATE users
            SET role = 'SELLER', updated_at = NOW()
            WHERE id = $1`,
           [application.user_id]

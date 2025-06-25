@@ -4,135 +4,148 @@ import { authOptions } from "@/lib/auth";
 import { query } from '@/lib/db';
 import { User } from '@/types/database';
 
-export async function POST(req: Request) {
+// POST - подача заявки на продавца
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions) as { user?: User };
-    if (!session?.user?.email) {
+
+    if (!session?.user) {
       return NextResponse.json(
-        { error: "Вы не авторизованы" },
+        { error: 'Требуется авторизация' },
         { status: 401 }
       );
     }
 
-    // Получаем пользователя
-    const userResult = await query(
-      'SELECT * FROM users WHERE email = $1',
-      [session.user.email]
-    );
-    const user = userResult.rows[0];
-
-    if (!user) {
+    // Проверяем, что пользователь имеет роль BUYER
+    if (session.user.role !== 'BUYER') {
       return NextResponse.json(
-        { error: "Пользователь не найден" },
-        { status: 404 }
+        { error: 'Только покупатели могут подавать заявки на продавца' },
+        { status: 403 }
       );
     }
 
-    if (user.role === 'SELLER') {
+    const body = await request.json();
+    const { 
+      companyName, 
+      companyDescription, 
+      businessType, 
+      taxId, 
+      website, 
+      phone, 
+      address 
+    } = body;
+
+    // Валидация обязательных полей
+    if (!companyName || !companyDescription || !phone) {
       return NextResponse.json(
-        { error: "Вы уже являетесь продавцом" },
+        { error: 'Заполните все обязательные поля' },
         { status: 400 }
       );
     }
 
-    // Проверяем существующую заявку
+    // Проверяем, нет ли уже активной заявки от этого пользователя
     const existingApplicationResult = await query(
-      'SELECT * FROM "SellerApplication" WHERE user_id = $1',
-      [user.id]
+      'SELECT id, status FROM seller_applications WHERE user_id = $1',
+      [session.user.id]
     );
-    const existingApplication = existingApplicationResult.rows[0];
 
-    if (existingApplication) {
+    if (existingApplicationResult.rows.length > 0) {
+      const existingApplication = existingApplicationResult.rows[0];
       if (existingApplication.status === 'PENDING') {
         return NextResponse.json(
-          { error: "Ваша заявка уже находится на рассмотрении" },
+          { error: 'У вас уже есть активная заявка на рассмотрении' },
           { status: 400 }
         );
-      } else if (existingApplication.status === 'APPROVED') {
+      }
+      if (existingApplication.status === 'APPROVED') {
         return NextResponse.json(
-          { error: "Ваша заявка уже была одобрена" },
+          { error: 'Ваша заявка уже одобрена' },
           { status: 400 }
         );
       }
     }
 
-    const { message } = await req.json();
-
-    // Создаем или обновляем заявку
+    // Создаем новую заявку
     const applicationResult = await query(
-      `INSERT INTO "SellerApplication" (
-        user_id, status, message, created_at, updated_at
-      ) VALUES ($1, 'PENDING', $2, NOW(), NOW())
-      ON CONFLICT (user_id) DO UPDATE SET
-        status = 'PENDING',
-        message = $2,
-        updated_at = NOW(),
-        reviewed_by = NULL,
-        reviewed_at = NULL,
-        review_notes = NULL
+      `INSERT INTO seller_applications (
+        user_id, 
+        company_name, 
+        company_description, 
+        business_type, 
+        tax_id, 
+        website, 
+        phone, 
+        address,
+        status,
+        created_at,
+        updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'PENDING', NOW(), NOW())
       RETURNING *`,
-      [user.id, message]
+      [
+        session.user.id,
+        companyName,
+        companyDescription,
+        businessType,
+        taxId,
+        website,
+        phone,
+        address
+      ]
     );
 
-    return NextResponse.json(applicationResult.rows[0]);
+    return NextResponse.json({
+      message: 'Заявка успешно подана',
+      application: applicationResult.rows[0]
+    }, { status: 201 });
+
   } catch (error) {
-    console.error('Error submitting seller application:', error);
+    console.error('Error creating seller application:', error);
     return NextResponse.json(
-      { error: "Произошла ошибка при отправке заявки" },
+      { error: 'Ошибка при подаче заявки' },
       { status: 500 }
     );
   }
 }
 
+// GET - получение статуса заявки текущего пользователя
 export async function GET() {
   try {
     const session = await getServerSession(authOptions) as { user?: User };
-    if (!session?.user?.email) {
+
+    if (!session?.user) {
       return NextResponse.json(
-        { error: "Вы не авторизованы" },
+        { error: 'Требуется авторизация' },
         { status: 401 }
       );
     }
 
-    // Получаем пользователя и его заявку
-    const result = await query(
-      `SELECT 
-        u.*,
-        sa.*
-      FROM users u
-      LEFT JOIN "SellerApplication" sa ON u.id = sa.user_id
-      WHERE u.email = $1`,
-      [session.user.email]
+    // Получаем заявку пользователя
+    const applicationResult = await query(
+      `SELECT sa.*, 
+        CASE 
+          WHEN sa.reviewed_by IS NOT NULL THEN 
+            (SELECT name FROM users WHERE id = sa.reviewed_by)
+          ELSE NULL 
+        END as reviewer_name
+      FROM seller_applications sa 
+      WHERE sa.user_id = $1
+      ORDER BY sa.created_at DESC
+      LIMIT 1`,
+      [session.user.id]
     );
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: "Пользователь не найден" },
-        { status: 404 }
-      );
+    if (applicationResult.rows.length === 0) {
+      return NextResponse.json({ application: null });
     }
 
-    const user = result.rows[0];
-    const application = user.user_id ? {
-      id: user.id,
-      userId: user.user_id,
-      status: user.status,
-      message: user.message,
-      createdAt: user.created_at,
-      updatedAt: user.updated_at,
-      reviewedBy: user.reviewed_by,
-      reviewedAt: user.reviewed_at,
-      reviewNotes: user.review_notes
-    } : null;
-
     return NextResponse.json({
-      application,
-      role: user.role
+      application: applicationResult.rows[0]
     });
+
   } catch (error) {
     console.error('Error fetching seller application:', error);
     return NextResponse.json(
-      { error: "Произошла ошибка при получении данных о заявке" },
+      { error: 'Ошибка при получении заявки' },
       { status: 500 }
     );
   }
