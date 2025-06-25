@@ -54,7 +54,7 @@ export async function GET(request: Request) {
         WHERE 1=1
       `;
     } catch (error) {
-      console.log('product_images table not found, using simple query. Error:', error.message);
+      console.log('product_images table not found, using simple query. Error:', error instanceof Error ? error.message : String(error));
       hasImageTable = false;
       queryStr = 'SELECT * FROM products WHERE 1=1';
     }
