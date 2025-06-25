@@ -95,6 +95,75 @@ export async function GET(request: Request, { params }: { params: { id: string }
 // Add or update POST function for updating stock later
 // export async function POST(request: Request, { params }: { params: { id: string } }) { /* ... */ }
 
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const productId = params.id;
+    const body = await request.json();
+    const { name, description, price, category, stock, images } = body;
+
+    // Валидация
+    if (!name || !description || price === undefined || stock === undefined) {
+      return NextResponse.json(
+        { error: 'Отсутствуют обязательные поля' },
+        { status: 400 }
+      );
+    }
+
+    // Начинаем транзакцию
+    await query('BEGIN');
+
+    try {
+      // Обновляем основную информацию о товаре
+      const updateResult = await query(
+        `UPDATE products 
+         SET name = $1, description = $2, price = $3, updated_at = NOW()
+         WHERE id = $4
+         RETURNING *`,
+        [name, description, parseFloat(price), productId]
+      );
+
+      if (updateResult.rows.length === 0) {
+        await query('ROLLBACK');
+        return NextResponse.json(
+          { error: 'Товар не найден' },
+          { status: 404 }
+        );
+      }
+
+      // Если переданы новые изображения, обновляем их
+      if (images && images.length > 0) {
+        // Удаляем старые изображения
+        await query('DELETE FROM product_images WHERE product_id = $1', [productId]);
+        
+        // Добавляем новые изображения
+        for (const image of images) {
+          await query(
+            'INSERT INTO product_images (product_id, url) VALUES ($1, $2)',
+            [productId, image.url]
+          );
+        }
+      }
+
+      await query('COMMIT');
+
+      // Возвращаем обновленный товар
+      const response = await GET(request, { params });
+      return response;
+
+    } catch (error) {
+      await query('ROLLBACK');
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('Product update error:', error);
+    return NextResponse.json(
+      { error: 'Ошибка при обновлении товара' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const productId = params.id;

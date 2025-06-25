@@ -9,12 +9,15 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
+  images: { url: string; alt?: string }[];
   category: string;
-  size: string;
-  color: string;
   stock: number;
-  sellerId: string;
+  seller: {
+    id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function ProductsAdminPage() {
@@ -49,12 +52,27 @@ export default function ProductsAdminPage() {
     try {
       setLoading(true);
       const isAdmin = session && session.user && 'role' in session.user && session.user.role === 'ADMIN';
-      const response = await fetch(
-        isAdmin
-          ? '/api/admin/products'
-          : '/api/seller/products'
-      );
-      if (!response.ok) throw new Error('Ошибка при загрузке товаров');
+      
+      if (!isAdmin) {
+        setError('Недостаточно прав для доступа к этой странице');
+        return;
+      }
+      
+      const response = await fetch('/api/admin/products', {
+        headers: {
+          'Authorization': `Bearer ${(session as any)?.accessToken || ''}`,
+        },
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Требуется авторизация');
+          router.push('/auth/login');
+          return;
+        }
+        throw new Error('Ошибка при загрузке товаров');
+      }
+      
       const data = await response.json();
       setProducts(data);
     } catch (err) {
@@ -191,24 +209,46 @@ export default function ProductsAdminPage() {
           </form>
         </div>
         <div>
-          <h2 className="text-xl font-semibold mb-4">Ваши товары</h2>
-          <ul className="space-y-4">
-            {products.map(product => (
-              <li key={product.id} className="flex items-center gap-4 border p-4 rounded-md bg-white">
-                <img src={product.imageUrl} alt={product.name} className="w-20 h-20 object-cover rounded" />
-                <div className="flex-1">
-                  <div className="font-semibold text-lg text-gray-900">{product.name}</div>
-                  <div className="text-gray-700">{product.description}</div>
-                  <div className="text-gray-700">Цена: {product.price} ₽</div>
-                  <div className="text-gray-700">Категория: {product.category}</div>
-                  <div className="text-gray-700">Размер: {product.size}</div>
-                  <div className="text-gray-700">Цвет: {product.color}</div>
-                  <div className="text-gray-700">В наличии: {product.stock}</div>
-                </div>
-                <button onClick={() => handleDelete(product.id, product.imageUrl)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Удалить</button>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-xl font-semibold mb-4">Все товары ({products.length})</h2>
+          {products.length === 0 ? (
+            <div className="text-gray-500 text-center py-8">Товаров не найдено</div>
+          ) : (
+            <ul className="space-y-4">
+              {products.map(product => (
+                <li key={product.id} className="flex items-center gap-4 border p-4 rounded-md bg-white shadow-sm">
+                  {product.images && product.images.length > 0 ? (
+                    <img src={product.images[0].url} alt={product.name} className="w-20 h-20 object-cover rounded" />
+                  ) : (
+                    <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
+                      <span className="text-xs text-gray-500">Нет фото</span>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="font-semibold text-lg text-gray-900">{product.name}</div>
+                    <div className="text-gray-600 text-sm mb-1">{product.description}</div>
+                    <div className="text-green-600 font-semibold">Цена: {product.price} ₽</div>
+                    <div className="text-gray-700 text-sm">Категория: {product.category}</div>
+                    <div className="text-gray-700 text-sm">В наличии: {product.stock}</div>
+                    <div className="text-blue-600 text-sm">Продавец: {product.seller.name}</div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      onClick={() => router.push(`/admin/products/edit/${product.id}`)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-sm"
+                    >
+                      Редактировать
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(product.id, product.images[0]?.url || '')}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition text-sm"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
