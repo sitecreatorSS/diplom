@@ -28,7 +28,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
           u.name as seller_name,
           COALESCE(
             json_agg(
-              json_build_object('url', pi.url, 'alt', COALESCE(pi.alt_text, p.name))
+              json_build_object('url', pi.url, 'alt', p.name)
             ) FILTER (WHERE pi.id IS NOT NULL), 
             '[]'
           ) AS images

@@ -45,7 +45,7 @@ export async function GET(request: Request) {
           p.*,
           COALESCE(
             json_agg(
-              json_build_object('url', pi.url, 'alt', COALESCE(pi.alt_text, p.name))
+              json_build_object('url', pi.url, 'alt', p.name)
             ) FILTER (WHERE pi.id IS NOT NULL), 
             '[]'
           ) AS images

@@ -28,10 +28,8 @@ export async function GET() {
         json_agg(
           json_build_object(
             'id', pi.id,
-            'url', pi.url,
-            'alt', pi.alt_text,
-            'order', pi."order"
-          ) ORDER BY pi."order"
+            'url', pi.url
+          ) ORDER BY pi.id
         ) as images
       FROM products p
       LEFT JOIN product_images pi ON p.id = pi.product_id
@@ -102,13 +100,11 @@ export async function POST(request: Request) {
         const image = images[i];
         await query(
           `INSERT INTO product_images (
-            product_id, url, alt_text, "order", created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+            product_id, url
+          ) VALUES ($1, $2)`,
           [
             product.id,
-            image.url,
-            image.alt || `${name} image ${i + 1}`,
-            i
+            image.url
           ]
         );
       }
@@ -120,10 +116,8 @@ export async function POST(request: Request) {
           json_agg(
             json_build_object(
               'id', pi.id,
-              'url', pi.url,
-              'alt', pi.alt_text,
-              'order', pi."order"
-            ) ORDER BY pi."order"
+              'url', pi.url
+            ) ORDER BY pi.id
           ) as images
         FROM products p
         LEFT JOIN product_images pi ON p.id = pi.product_id
@@ -213,13 +207,11 @@ export async function PUT(request: Request) {
         const image = images[i];
         await query(
           `INSERT INTO product_images (
-            product_id, url, alt_text, "order", created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+            product_id, url
+          ) VALUES ($1, $2)`,
           [
             id,
-            image.url,
-            image.alt || `${name} image ${i + 1}`,
-            i
+            image.url
           ]
         );
       }
@@ -231,10 +223,8 @@ export async function PUT(request: Request) {
           json_agg(
             json_build_object(
               'id', pi.id,
-              'url', pi.url,
-              'alt', pi.alt_text,
-              'order', pi."order"
-            ) ORDER BY pi."order"
+              'url', pi.url
+            ) ORDER BY pi.id
           ) as images
         FROM products p
         LEFT JOIN product_images pi ON p.id = pi.product_id
