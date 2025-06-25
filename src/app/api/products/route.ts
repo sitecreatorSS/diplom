@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       
       queryStr = `
         SELECT 
-          p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at,
+          p.*,
           COALESCE(
             json_agg(
               json_build_object('url', pi.url, 'alt', p.name)
@@ -78,9 +78,9 @@ export async function GET(request: Request) {
 
     // Add GROUP BY (only if using image table), ordering and limit
     if (hasImageTable) {
-      queryStr += ' GROUP BY p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at ORDER BY p.created_at DESC';
+      queryStr += ' GROUP BY p.id ORDER BY p.id DESC';
     } else {
-      queryStr += ' ORDER BY created_at DESC';
+      queryStr += ' ORDER BY id DESC';
     }
     
     if (limit > 0) {
@@ -108,7 +108,7 @@ export async function GET(request: Request) {
       description: product.description,
       price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
       category: 'Общее', // Статическая категория, так как в простой схеме нет поля category
-      stock: product.stock,
+      stock: Math.floor(Math.random() * 50) + 1, // Статический stock пока
       rating: generateRandomRating(),
       reviewCount: Math.floor(Math.random() * 100) + 1,
       seller: {

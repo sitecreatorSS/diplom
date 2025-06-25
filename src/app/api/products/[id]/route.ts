@@ -24,7 +24,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       
       result = await query(`
         SELECT 
-          p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at,
+          p.*,
           u.name as seller_name,
           COALESCE(
             json_agg(
@@ -36,7 +36,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
         LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE p.id = $1
-        GROUP BY p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at, u.name
+        GROUP BY p.id, u.name
       `, [productId]);
     } catch (error) {
       console.log('product_images table not found, using simple query for product', productId);
@@ -67,7 +67,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       category: 'Общее', // Пока используем статическую категорию, так как в простой схеме нет поля category
       sizes: ['S', 'M', 'L', 'XL'], // Статические размеры пока
       colors: ['Красный', 'Синий', 'Зеленый'], // Статические цвета пока
-      stock: product.stock,
+      stock: Math.floor(Math.random() * 50) + 1, // Статический stock пока
       rating: Math.floor(Math.random() * 1.5 + 3.5 * 10) / 10, // Случайный рейтинг от 3.5 до 5
       images: product.images || (product.image ? [{ url: product.image, alt: product.name }] : []),
       seller: {
