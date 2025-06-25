@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     
     try {
       // Пробуем запрос с изображениями
-      await query('SELECT 1 FROM "ProductImage" LIMIT 1');
+      await query('SELECT 1 FROM product_images LIMIT 1');
       
       result = await query(`
         SELECT 
@@ -34,12 +34,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
           ) AS images
         FROM products p
         LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
-        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE p.id = $1
         GROUP BY p.id, u.name
       `, [productId]);
     } catch (error) {
-      console.log('ProductImage table not found, using simple query for product', productId);
+      console.log('product_images table not found, using simple query for product', productId);
       hasImageTable = false;
       
       result = await query(`

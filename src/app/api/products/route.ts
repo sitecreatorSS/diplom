@@ -37,8 +37,8 @@ export async function GET(request: Request) {
     
     // Try to use image table first, fallback to simple query
     try {
-      // Check if ProductImage table exists by trying a simple query
-      await query('SELECT 1 FROM "ProductImage" LIMIT 1');
+      // Check if product_images table exists by trying a simple query
+      await query('SELECT 1 FROM product_images LIMIT 1');
       
       queryStr = `
         SELECT 
@@ -50,11 +50,11 @@ export async function GET(request: Request) {
             '[]'
           ) AS images
         FROM products p
-        LEFT JOIN "ProductImage" pi ON p.id = pi.product_id
+        LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE 1=1
       `;
     } catch (error) {
-      console.log('ProductImage table not found, using simple query');
+      console.log('product_images table not found, using simple query. Error:', error.message);
       hasImageTable = false;
       queryStr = 'SELECT * FROM products WHERE 1=1';
     }
@@ -91,6 +91,15 @@ export async function GET(request: Request) {
     // Get products
     const result = await query(queryStr, params);
     const products = result.rows;
+    
+    console.log('Query executed:', queryStr);
+    console.log('Has image table:', hasImageTable);
+    console.log('Sample product data:', products[0] ? {
+      id: products[0].id,
+      name: products[0].name,
+      image: products[0].image,
+      images: products[0].images
+    } : 'No products found');
 
     // Transform products
     const transformedProducts = products.map((product: any) => ({
