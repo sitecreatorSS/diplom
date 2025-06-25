@@ -45,6 +45,8 @@ export default function ProductDetailsPage() {
         }
         
         const data: Product = await response.json();
+        console.log('Product data received:', data);
+        console.log('Images:', data.images);
         setProduct(data);
         // Set default size and color if available
         if (data.sizes && data.sizes.length > 0) {
@@ -124,8 +126,12 @@ export default function ProductDetailsPage() {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2">
           {product.images && product.images.length > 0 ? (
-            <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg shadow-sm">
-              <span className="text-muted-foreground">Нет изображения</span>
+            <div className="w-full h-96 rounded-lg shadow-sm overflow-hidden">
+              <img 
+                src={product.images[0].url} 
+                alt={product.images[0].alt || product.name}
+                className="w-full h-full object-cover"
+              />
             </div>
           ) : (
             <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg shadow-sm">
