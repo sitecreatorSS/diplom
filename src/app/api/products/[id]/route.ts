@@ -24,7 +24,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       
       result = await query(`
         SELECT 
-          p.*,
+          p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at,
           u.name as seller_name,
           COALESCE(
             json_agg(
@@ -36,7 +36,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         LEFT JOIN "User" u ON p.seller_id = u.id OR p."sellerId" = u.id
         LEFT JOIN product_images pi ON p.id = pi.product_id
         WHERE p.id = $1
-        GROUP BY p.id, u.name
+        GROUP BY p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at, u.name
       `, [productId]);
     } catch (error) {
       console.log('product_images table not found, using simple query for product', productId);

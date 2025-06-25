@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       
       queryStr = `
         SELECT 
-          p.*,
+          p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at,
           COALESCE(
             json_agg(
               json_build_object('url', pi.url, 'alt', p.name)
@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
     // Add GROUP BY (only if using image table), ordering and limit
     if (hasImageTable) {
-      queryStr += ' GROUP BY p.id ORDER BY p.created_at DESC';
+      queryStr += ' GROUP BY p.id, p.name, p.description, p.price, p.stock, p.seller_id, p.image, p.created_at, p.updated_at ORDER BY p.created_at DESC';
     } else {
       queryStr += ' ORDER BY created_at DESC';
     }
