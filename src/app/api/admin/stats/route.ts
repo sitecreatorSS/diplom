@@ -24,13 +24,27 @@ export async function GET() {
     }
 
     // Получаем статистику одним запросом
-    const statsResult = await query(`
-      SELECT
-        (SELECT COUNT(*) FROM users) as total_users,
-        (SELECT COUNT(*) FROM products) as total_products,
-        (SELECT COUNT(*) FROM "Order") as total_orders,
-        (SELECT SUM(total) FROM "Order" WHERE status = 'DELIVERED') as total_revenue
-    `);
+    let statsResult;
+    try {
+      // Пробуем с таблицей orders
+      statsResult = await query(`
+        SELECT
+          (SELECT COUNT(*) FROM users) as total_users,
+          (SELECT COUNT(*) FROM products) as total_products,
+          (SELECT COUNT(*) FROM orders) as total_orders,
+          (SELECT COALESCE(SUM(total), 0) FROM orders WHERE status = 'DELIVERED') as total_revenue
+      `);
+    } catch (error) {
+      console.log('Orders table not found, using fallback stats');
+      // Fallback если таблицы заказов нет
+      statsResult = await query(`
+        SELECT
+          (SELECT COUNT(*) FROM users) as total_users,
+          (SELECT COUNT(*) FROM products) as total_products,
+          0 as total_orders,
+          0 as total_revenue
+      `);
+    }
 
     const stats = statsResult.rows[0];
 

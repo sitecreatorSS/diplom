@@ -41,7 +41,7 @@ export async function PATCH(
       email: string;
       role: UserRole;
     }>(
-      `UPDATE "User" 
+      `UPDATE users 
        SET role = $1, updated_at = NOW() 
        WHERE id = $2 
        RETURNING id, name, email, role`,

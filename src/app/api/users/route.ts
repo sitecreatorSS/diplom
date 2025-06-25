@@ -91,8 +91,28 @@ export async function DELETE(request: Request) {
       return new NextResponse('User ID is required', { status: 400 });
     }
 
-    // Удаляем пользователя из базы данных
-    await query('DELETE FROM users WHERE id = $1', [id]);
+    // Удаляем пользователя из базы данных (с каскадным удалением)
+    await query('BEGIN');
+    try {
+      // Сначала удаляем изображения товаров этого продавца
+      await query(`
+        DELETE FROM product_images 
+        WHERE product_id IN (
+          SELECT id FROM products WHERE seller_id = $1
+        )
+      `, [id]);
+      
+      // Затем удаляем все товары этого продавца
+      await query('DELETE FROM products WHERE seller_id = $1', [id]);
+      
+      // Наконец удаляем самого пользователя
+      await query('DELETE FROM users WHERE id = $1', [id]);
+      
+      await query('COMMIT');
+    } catch (error) {
+      await query('ROLLBACK');
+      throw error;
+    }
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
